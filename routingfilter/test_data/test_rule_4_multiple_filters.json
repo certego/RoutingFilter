@@ -1,0 +1,32 @@
+{
+  "streams": {
+    "rules": {
+      "mountain_bike": [
+        {
+          "filters": [
+            {
+              "type": "EXISTS",
+              "key": "wheel_model"
+            },
+            {
+              "type": "NOT_EXISTS",
+              "key": "not_existing_key"
+            },
+            {
+              "type": "STARTSWITH",
+              "key": "wheel_model",
+              "value": [
+                "Super"
+              ]
+            }
+          ],
+          "streams": {
+            "Workshop": {
+              "workers_needed": 1
+            }
+          }
+        }
+      ]
+    }
+  }
+}

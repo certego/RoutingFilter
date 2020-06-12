@@ -1,0 +1,20 @@
+{
+  "streams": {
+    "rules": {
+      "mountain_bike": [
+        {
+          "filters": [
+            {
+              "type": "ALL"
+            }
+          ],
+          "streams": {
+            "Workshop": {
+              "workers_needed": 1
+            }
+          }
+        }
+      ]
+    }
+  }
+}

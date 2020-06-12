@@ -1,0 +1,22 @@
+{
+  "streams": {
+    "rules": {
+      "ip_traffic": [
+        {
+          "filters": [
+            {
+              "type": "DOMAIN",
+              "key": "domain",
+              "value": "domain.local"
+            }
+          ],
+          "streams": {
+            "Workshop": {
+              "workers_needed": 1
+            }
+          }
+        }
+      ]
+    }
+  }
+}

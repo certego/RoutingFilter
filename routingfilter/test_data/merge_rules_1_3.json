@@ -1,0 +1,50 @@
+{
+  "streams": {
+    "rules": {
+      "mountain_bike": [
+        {
+          "filters": [
+            {
+              "type": "EQUALS",
+              "key": "wheel_model",
+              "description": "Carbon fiber wheels needs manual truing",
+              "value": [
+                "Superlight",
+                "RacePro"
+              ]
+            }
+          ],
+          "streams": {
+            "Workshop": {
+              "workers_needed": 1
+            }
+          }
+        }
+      ]
+    }
+  },
+  "customer": {
+    "rules": {
+      "all": [
+        {
+          "filters": [
+            {
+              "type": "EQUALS",
+              "key": "wheel_model",
+              "description": "Carbon fiber wheels needs manual truing",
+              "value": [
+                "Superlight",
+                "RacePro"
+              ]
+            }
+          ],
+          "streams": {
+            "Workshop": {
+              "workers_needed": 1
+            }
+          }
+        }
+      ]
+    }
+  }
+}

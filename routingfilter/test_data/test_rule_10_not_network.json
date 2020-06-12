@@ -1,0 +1,22 @@
+{
+  "streams": {
+    "rules": {
+      "ip_traffic": [
+        {
+          "filters": [
+            {
+              "type": "NOT_NETWORK",
+              "key": "src_addr",
+              "value": "192.168.1.0/24"
+            }
+          ],
+          "streams": {
+            "Workshop": {
+              "workers_needed": 1
+            }
+          }
+        }
+      ]
+    }
+  }
+}

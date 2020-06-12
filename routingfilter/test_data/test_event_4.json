@@ -1,0 +1,8 @@
+{
+  "tags": "ip_traffic",
+  "src_addr": "192.168.1.10",
+  "dst_addr": "192.168.1.15",
+  "src_network": "192.168.1.0/24",
+  "dst_network": "192.168.1.0/24",
+  "domain": "test.domain.local"
+}
