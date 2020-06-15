@@ -8,5 +8,5 @@ setup(
     license='GNU LGPLv3',
     author='Certego S.r.l.',
     author_email='support@certego.net',
-    description='A module to process events through filters'
+    description='Generic Business Logic Implementation for Routing objects as python dictionaries'
 )

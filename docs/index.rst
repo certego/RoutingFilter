@@ -52,20 +52,34 @@ Sample usage::
    routing.load_from_dict([test_rule_1])
    routing.match(test_event_1)
 
+The rule's top level name (default `streams`) can be changed. In this case, the new name can be specified when calling the `match` method.
+
+At the monent, the second level (`rule`) is hard-coded and will likely be removed in the future, since it has no semantic.
+
+The third level matches a field in the event (default `tags`). It can be changed when calling the `matches` method.
+
 Available filters
 ==================
 For filter types which use "key" and "value" field, they can be both a string or a list of strings.
 The chosen logic is OR (at least a match must be satisfied).
+
 * **ALL** - matches with everithing, always returns True
 * **EXISTS** - returns True if the key in "key" field exists
 * **NOT_EXISTS** - returns False if the key in "key" field exists
-* **EQUALS** - returns True if the specified "key" has the given "value"
+* **EQUALS** - returns True if the value in the specified "key" is equal to "value"
 * **STARTSWITH** - returns True if a "key"'s value starts with "value"
 * **KEYWORD** - returns True if "value" is present in "key" (item in list or string in substring)
 * **REGEXP** - returns True if a "key"'s value matches the RegExp specified in "value"
 * **NETWORK** - Parses the field into ad IP address or network and returns True if the IP address is contained in the specified network
 * **NOT_NETWORK** - Parses the field into ad IP address or network and returns True if the IP address is NOT contained in the specified network
 * **DOMAIN** - Similar to EQUALS but also tries to parse subdomains (separated by ".")
+* **GREATER** - returns True if the value in the specified "key" is greater than "value".
+* **LESS** - returns True if the value in the specified "key" is less than "value"
+* **GREATER_EQ** - returns True if the value in the specified "key" is greater than or equal to "value"
+* **LESS_EQ** - returns True if the value in the specified "key" is less than or equal to "value"
+
+The filters NETWORK and NOT_NETWORK must be strings containing a valid IP or network address (using CIDR notation), otherwise a ValueError is raised.
+The filters GREATER, LESS, GREATER_EQ, LESS_EQ require float (or float-parsable) values, otherwise a ValueError is raised.
 
 Routing
 ==================
