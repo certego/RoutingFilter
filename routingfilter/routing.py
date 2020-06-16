@@ -68,7 +68,7 @@ class Routing:
 
         :param rules_list: The configuration
         :type rules_list: list[dict]
-        :return The merged rule set which has been applied
+        :return: The merged rule set which has been applied
         """
         rules_list = copy.deepcopy(rules_list)
         if not rules_list:

@@ -34,3 +34,8 @@ venv
 
 # Documentation
 docs/_build
+
+# Build files
+build/
+dist/
+routingfilter.egg-info/
