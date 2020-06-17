@@ -58,6 +58,8 @@ At the monent, the second level (`rule`) is hard-coded and will likely be remove
 
 The third level matches a field in the event (default `tags`). It can be changed when calling the `matches` method.
 
+The "streams" element after `filters` means that, if the filter matches, the event will be enriched with the `Workshop` dictionary.
+
 Available filters
 ==================
 For filter types which use "key" and "value" field, they can be both a string or a list of strings.
@@ -80,6 +82,64 @@ The chosen logic is OR (at least a match must be satisfied).
 
 The filters NETWORK and NOT_NETWORK must be strings containing a valid IP or network address (using CIDR notation), otherwise a ValueError is raised.
 The filters GREATER, LESS, GREATER_EQ, LESS_EQ require float (or float-parsable) values, otherwise a ValueError is raised.
+
+Example
+==================
+Let's see a routing application with firewall rules. We have network traffic events in the following format: ::
+
+   test_event_n1 = {
+     "tags": "ip_traffic",
+     "src_addr": "192.168.1.10",
+     "dst_addr": "192.168.1.15",
+     "domain": "test.domain.local"
+   }
+   test_event_n2 = {
+     "tags": "ip_traffic",
+     "src_addr": "192.168.2.10",
+     "dst_addr": "192.168.2.15",
+     "domain": "test.otherdomain.local"
+   }
+
+We want to filter all traffic tagged as `ip_traffic`, coming from the subnet `192.168.1.0/24` and enrich all the other events with a new field `processed`.
+We create the following rule: ::
+
+   test_rule_n1 = {
+     "streams": {
+       "rules": {
+         "ip_traffic": [
+           {
+             "filters": [
+               {
+                 "type": "NETWORK",
+                 "key": "src_addr",
+                 "value": "192.168.1.0/24"
+               }
+             ],
+             "streams": {
+               "filtered": False
+             }
+           }
+         ]
+       }
+     }
+   }
+
+If we apply this rule to `test_event_n1`, it will match, since the `src_addr` is in the subnet `192.168.1.0/24`. We are obtaining the following output: ::
+
+   {
+     "rules": [
+       {
+         "type": "NETWORK",
+         "key": "src_addr",
+         "value": "192.168.1.0/24"
+       }
+     ],
+     "output": {
+       "filtered": False
+     }
+   }
+
+The second event will not match with rule `test_event_n1`, since the `src_addr` is not in the subnet `192.168.1.0/24`. The function will return an empty dictionary.
 
 Routing
 ==================
