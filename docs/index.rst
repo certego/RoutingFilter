@@ -54,9 +54,11 @@ Sample usage::
 
 The rule's top level name (default `streams`) can be changed. In this case, the new name can be specified when calling the `match` method.
 
-At the monent, the second level (`rule`) is hard-coded and will likely be removed in the future, since it has no semantic.
+At the moment, the second level (`rule`) is hard-coded and will likely be removed in the future, since it has no semantic.
 
 The third level matches a field in the event (default `tags`). It can be changed when calling the `matches` method.
+When the first rule with a given tag (i.e. "mountain_bike") matches the event, the following are ignored.
+Rules with different tags can match independently (for example, if we want to send an event to different pipelines, based on the tag).
 
 The "streams" element after `filters` means that, if the filter matches, the event will be enriched with the `Workshop` dictionary.
 
@@ -65,7 +67,7 @@ Available filters
 For filter types which use "key" and "value" field, they can be both a string or a list of strings.
 The chosen logic is OR (at least a match must be satisfied).
 
-* **ALL** - matches with everithing, always returns True
+* **ALL** - matches with everithing, always returns True (if this matches, all other rules are ignored)
 * **EXISTS** - returns True if the key in "key" field exists
 * **NOT_EXISTS** - returns False if the key in "key" field exists
 * **EQUALS** - returns True if the value in the specified "key" is equal to "value"

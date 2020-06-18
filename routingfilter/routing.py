@@ -9,19 +9,30 @@ class Routing:
     def __init__(self):
         self.rules = None
 
+    def get_rules(self):
+        """Return the currently loaded rules. It is mainly used for debugging purposes.
+
+        :return: A dict or None
+        """
+        return self.rules
+
     def match(self, event, type_="streams", tag_field_name="tags"):
         """Process a single event message through routing filters and verify if it matches with (at least) one filter.
+        For each top level tag in the rule, only the first matching filter is returned.
+        Multiple dictionaries can only be returned with rules matching different tags.
 
         :param event: The entire event to process
         :type event: dict
-        :param type_: The event type (can be 'streams', 'customer' or everything else, as defined in the routing config)
+        :param type_: The event type (can be 'streams', 'customer' or everything else, as defined in the routing config). If the type does not exists, an empty list is returned
         :type type_: str
         :param tag_field_name: The event field to search into (default='tags')
         :type tag_field_name: str
-        :return: A dict containing a list of the matched rules and the outputs in the following format: {"rules": [...], "output": {...}}
+        :return: A list of dicts containing the matched rules and the outputs in the following format: {"rules": [...], "output": {...}}; an empty list if no rule matched
         """
         if not self.rules:
             raise ValueError("'rules_list' must be set before evaluating a match!")
+        if type_ not in self.rules:
+            return []
 
         # iterate through the common set of tags
         streams_tags = set(self.rules[type_]["rules"].keys())
@@ -30,7 +41,7 @@ class Routing:
             tags = [tags]
         tags = set(tags)
         msg_tags = (tags & streams_tags)
-        matching_rules = {}
+        matching_rules = []
 
         # if in routing stream there is an "all" tag I'm checking it for every msg
         # the "all" routing rules are applied to every msg, to check for those I'm adding the tag in
@@ -44,23 +55,22 @@ class Routing:
                 # check if ALL the filters are matching
                 filters = [ConfigFilter(f) for f in rule.get("filters", [])]
                 if all(f.is_matching(event) for f in filters):
-                    matching_rules.update(rule if rule.get(type_) else {})
-        else:
+                    matching_rules.append(rule if rule.get(type_) else {})
+        if not matching_rules:
             for tag_field_name in msg_tags:
                 for rule in self.rules[type_]["rules"].get(tag_field_name, []):
                     # check if ALL the filters are matching
                     filters = [ConfigFilter(f) for f in rule.get("filters", [])]
-                    if all(f.is_matching(event) for f in filters):
-                        matching_rules.update(rule)
-                        # output = rule.get(type, {})
-                        # if output:
-                        #     matching_rules.update(output)
+                    if filters and all(f.is_matching(event) for f in filters):
+                        matching_rules.append(rule)
                         break  # the first matching rule wins
         # Rename "filters" to "rules" and "type" to "output" to be more generic
-        if "filters" in matching_rules:
-            matching_rules["rules"] = matching_rules.pop("filters")
-        if type_ in matching_rules:
-            matching_rules["output"] = matching_rules.pop(type_)
+        matching_rules = copy.deepcopy(matching_rules)
+        for mr in matching_rules:
+            if "filters" in mr:
+                mr["rules"] = mr.pop("filters")
+            if type_ in mr:
+                mr["output"] = mr.pop(type_)
         return matching_rules
 
     def load_from_dicts(self, rules_list):
@@ -68,7 +78,6 @@ class Routing:
 
         :param rules_list: The configuration
         :type rules_list: list[dict]
-        :return: The merged rule set which has been applied
         """
         rules_list = copy.deepcopy(rules_list)
         if not rules_list:
@@ -88,7 +97,6 @@ class Routing:
                 else:
                     merged_rules[type_] = rules[type_]
         self.rules = merged_rules
-        return merged_rules
 
     def load_from_jsons(self, rules_list):
         """Load routing configuration from JSON data. It merges the different rules in list into a single routing rule.
