@@ -136,6 +136,7 @@ class RoutingTestCase(unittest.TestCase):
         self.assertTrue(self.routing.match(self.test_event_4))
         self.assertFalse(self.routing.match(self.test_event_5))
         self.routing.load_from_dicts([load_test_data("test_rule_12_greater")])  # GREATER
+        self.assertFalse(self.routing.match({}))
         self.assertTrue(self.routing.match(self.test_event_1))
         self.assertFalse(self.routing.match(self.test_event_3))
         with self.assertRaises(ValueError):

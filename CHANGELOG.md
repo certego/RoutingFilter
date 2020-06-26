@@ -1,5 +1,14 @@
 ## 1.0.x
 
+### 1.1.1
+#### Features
+* Added some logging
+#### Bugfix
+* Fixed a bug in GREATER, LESS, GREATER_EQ, LESS_EQ processing
+#### Changes
+* Added rule validation when loading rules_list (this can be disabled)
+* An exception is returned (instead of False) when processing a wrong filter type
+
 ### 1.1.0
 #### Changes
 * Changed match output to to list of dicts, to allow multiple rules with different tags to match

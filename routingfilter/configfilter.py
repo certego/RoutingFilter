@@ -1,4 +1,5 @@
 import re
+import logging
 
 from routingfilter.dictquery import DictQuery
 from IPy import IP
@@ -12,6 +13,7 @@ class ConfigFilter:
         value = filt.get('value', [])
         self.key = [key] if isinstance(key, str) else key
         self.value = [value] if isinstance(value, str) or isinstance(value, int) or isinstance(value, float) else value
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     def is_matching(self, data):
         """Return whether the specified event dictionary matches with the loaded filtering rules.
@@ -19,11 +21,14 @@ class ConfigFilter:
         :param data: The event to by processed
         :type data: dict
         :return: True if the event matches, False otherwise
+        :raises: AttributeError if an invalid filter is used (i.e. 'EQUAL' instead of 'EQUALS').
         """
         try:
+            self.logger.debug(f"Applying filter {self.type} to event: {data}")
             return getattr(self, '_filter_{}'.format(self.type))(data)
         except AttributeError:
-            return False
+            self.logger.error(f"Invalid filter specified in rules: {self.type}")
+            raise
 
     def _filter_ALL(self, data):
         return True
@@ -191,6 +196,8 @@ class ConfigFilter:
         # Wrapper for filters GREATER, LESS, GREATER_EQ, LESS_EQ
         for key in self.key:
             target = str(DictQuery(data).get(key, ''))
+            if not target:
+                return False
             if isinstance(target, list):
                 for t in target:
                     try:
