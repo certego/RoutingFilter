@@ -1,5 +1,9 @@
 ## 1.0.x
 
+### 1.1.2
+#### Bugfix
+* Fixed a bug in NETWORK filter type processing
+
 ### 1.1.1
 #### Features
 * Added some logging

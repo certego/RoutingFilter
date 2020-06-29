@@ -121,6 +121,8 @@ class ConfigFilter:
         return False
 
     def _filter_NETWORK(self, data):
+        if not data:
+            return False
         for key in self.key:
             target = DictQuery(data).get(key, '0.0.0.0')
             if isinstance(target, list):
@@ -142,6 +144,8 @@ class ConfigFilter:
         return False
 
     def _filter_NOT_NETWORK(self, data):
+        if not data:
+            return False
         for key in self.key:
             target = DictQuery(data).get(key, '0.0.0.0')
             if isinstance(target, list):
