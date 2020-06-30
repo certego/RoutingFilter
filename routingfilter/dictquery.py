@@ -24,5 +24,5 @@ class DictQuery(dict):
         except AttributeError:
             # If dict is like this { "foobar": 1} and path is foobar.test it would generate
             # an AttributeError. We manage this case like a failed match
-            value = None
+            value = default
         return value
