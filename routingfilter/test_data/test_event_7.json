@@ -1,0 +1,9 @@
+{
+  "tags": ["ip_traffic", "mountain_bike"],
+  "src_addr": "192.168.2.1w0",
+  "dst_addr": "192.168.2.15",
+  "src_network": "192.168.2.0/24",
+  "dst_network": "192.168.2.0/24",
+  "domain": "test.otherdomain.local",
+  "wheel_model": "Superlight"
+}
