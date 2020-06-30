@@ -9,15 +9,20 @@ class DictQuery(dict):
             return value
         keys = path.split('.')
         value = None
-        for key in keys:
-            if value:
-                if isinstance(value, list):
-                    value = [v.get(key, default) if v else None for v in value]
+        try:
+            for key in keys:
+                if value:
+                    if isinstance(value, list):
+                        value = [v.get(key, default) if v else None for v in value]
+                    else:
+                        value = value.get(key, default)
                 else:
-                    value = value.get(key, default)
-            else:
-                value = dict.get(self, key, default)
+                    value = dict.get(self, key, default)
 
-            if not value:
-                break
+                if not value:
+                    break
+        except AttributeError:
+            # If dict is like this { "foobar": 1} and path is foobar.test it would generate
+            # an AttributeError. We manage this case like a failed match
+            value = default
         return value

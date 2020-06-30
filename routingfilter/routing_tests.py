@@ -24,6 +24,7 @@ class RoutingTestCase(unittest.TestCase):
     test_event_4 = load_test_data("test_event_4")
     test_event_5 = load_test_data("test_event_5")
     test_event_6 = load_test_data("test_event_6")
+    test_event_7 = load_test_data("test_event_7")
 
     def setUp(self):
         self.routing = Routing()
@@ -96,6 +97,11 @@ class RoutingTestCase(unittest.TestCase):
         test_event_4_mod["tags"] = ["ip_traffic", "mountain_bike"]
         test_event_4_mod["wheel_model"] = "Superlight"
         self.assertEqual(len(self.routing.match(test_event_4_mod)), 2)
+
+    def test_event_wrong_field_name(self):
+        test_rule_7 = load_test_data("test_rule_7_wrongfield")
+        self.routing.load_from_dicts([test_rule_7])
+        self.assertEqual(self.routing.match(self.test_event_7), [])
 
     def test_single_filters(self):
         # Test all filter types defined in ConfigFilter
