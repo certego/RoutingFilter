@@ -42,14 +42,17 @@ class RoutingTestCase(unittest.TestCase):
             self.routing.load_from_jsons([])
 
     def test_multiple_rule_loading(self):
+        data = load_test_data("test_rule_1_equals")
         rule_list_duplicate = [
-            load_test_data("test_rule_1_equals"),
             load_test_data("test_rule_11_domain"),
-            load_test_data("test_rule_1_equals"),
+            data,
+            load_test_data("test_rule_11_domain"),
+            data,
             load_test_data("test_rule_5_exists"),
         ]
         self.routing.load_from_dicts(rule_list_duplicate)
         self.assertEqual(len(self.routing.get_rules()['streams']['rules']['mountain_bike']), 3)
+        self.assertEqual(len(self.routing.get_rules()['streams']['rules']['ip_traffic']), 2)
 
     def test_rule_1(self):
         # Test rule loading and applying with full output

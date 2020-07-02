@@ -86,7 +86,6 @@ class Routing:
         :type validate_rules: bool
         """
         self.logger.debug(f"Attempting to load rules_list: {rules_list}")
-        rules_list = copy.deepcopy(rules_list)
         if not rules_list:
             self.logger.warning("An empty rules_list has been passed. Makes sure this is intentional.")
             self.rules = {}
@@ -94,8 +93,9 @@ class Routing:
         if not isinstance(rules_list, list):
             self.logger.error("'rules_list' must be a list of dicts containing the routing rules!")
             raise ValueError("'rules_list' must be a list of dicts containing the routing rules!")
-        merged_rules = rules_list[0]
-        for rules in rules_list[1:]:
+        merged_rules = copy.deepcopy(rules_list[0])
+        for orig_rules in rules_list[1:]:
+            rules = copy.deepcopy(orig_rules)
             for type_ in rules.keys():
                 if type_ in merged_rules:
                     for tag in rules[type_]["rules"].keys():
