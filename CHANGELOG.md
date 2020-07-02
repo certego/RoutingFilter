@@ -1,4 +1,7 @@
 ## 1.0.x
+### 1.1.4
+#### Bugfix
+* Fixed a bug in rules loading with deepcopy
 
 ### 1.1.3
 #### Bugfix
