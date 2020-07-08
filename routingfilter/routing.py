@@ -59,6 +59,7 @@ class Routing:
                 filters = [ConfigFilter(f) for f in rule.get("filters", [])]
                 if all(f.is_matching(event) for f in filters):
                     matching_rules.append(rule if rule.get(type_) else {})
+                    break
         if not matching_rules:
             for tag_field_name in msg_tags:
                 for rule in self.rules[type_]["rules"].get(tag_field_name, []):

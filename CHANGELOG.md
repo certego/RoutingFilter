@@ -1,4 +1,8 @@
 ## 1.0.x
+### 1.1.5
+#### Bugfix
+* Added a break in "all" special tag processing
+
 ### 1.1.4
 #### Bugfix
 * Fixed a bug in rules loading with deepcopy

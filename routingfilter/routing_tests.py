@@ -53,6 +53,13 @@ class RoutingTestCase(unittest.TestCase):
         self.routing.load_from_dicts(rule_list_duplicate)
         self.assertEqual(len(self.routing.get_rules()['streams']['rules']['mountain_bike']), 3)
         self.assertEqual(len(self.routing.get_rules()['streams']['rules']['ip_traffic']), 2)
+        # Verify that the only first rule matches
+        rule_all = load_test_data("test_rule_2_all_equals")
+        filter_2 = copy.deepcopy(rule_all["streams"]["rules"]["all"][0])
+        filter_2["streams"] = {"Other": None}
+        rule_all["streams"]["rules"]["all"].append(filter_2)
+        self.routing.load_from_dicts([rule_all])
+        self.assertDictEqual(self.routing.match(self.test_event_1)[0]["output"], {'Workshop': {'workers_needed': 1}})
 
     def test_rule_1(self):
         # Test rule loading and applying with full output
