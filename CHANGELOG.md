@@ -1,4 +1,8 @@
 ## 1.0.x
+### 1.1.6
+#### Bugfix
+* Fixed missing rule output when matching a rule with "all" special tag
+
 ### 1.1.5
 #### Bugfix
 * Added a break in "all" special tag processing
