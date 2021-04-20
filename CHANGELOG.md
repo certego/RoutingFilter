@@ -1,4 +1,8 @@
 ## 1.0.x
+### 1.1.7
+#### Bugfix
+* Fixed routing matching when source key is a list.
+
 ### 1.1.6
 #### Bugfix
 * Fixed missing rule output when matching a rule with "all" special tag

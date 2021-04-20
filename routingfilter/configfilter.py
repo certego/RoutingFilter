@@ -47,7 +47,7 @@ class ConfigFilter:
 
     def _filter_EQUALS(self, data):
         for key in self.key:
-            target = str(DictQuery(data).get(key, ''))
+            target = DictQuery(data).get(key, '')
             if isinstance(target, list):
                 for t in target:
                     if self.__check_equals(t):
@@ -58,7 +58,7 @@ class ConfigFilter:
         return False
 
     def __check_equals(self, target):
-        target = target.lower()
+        target = str(target).lower()
         for value in self.value:
             if str(value).lower() == target:
                 return True
@@ -66,7 +66,7 @@ class ConfigFilter:
 
     def _filter_STARTSWITH(self, data):
         for key in self.key:
-            target = str(DictQuery(data).get(key, ''))
+            target = DictQuery(data).get(key, '')
             if isinstance(target, list):
                 for t in target:
                     if self.__check_startswith(t):
@@ -77,7 +77,7 @@ class ConfigFilter:
         return False
 
     def __check_startswith(self, target):
-        target = target.lower()
+        target = str(target).lower()
         for value in self.value:
             if target.startswith(str(value).lower()):
                 return True
@@ -85,7 +85,7 @@ class ConfigFilter:
 
     def _filter_KEYWORD(self, data):
         for key in self.key:
-            target = str(DictQuery(data).get(key, ''))
+            target = DictQuery(data).get(key, '')
             if isinstance(target, list):
                 for t in target:
                     if self.__check_keyword(t):
@@ -96,7 +96,7 @@ class ConfigFilter:
         return False
 
     def __check_keyword(self, target):
-        target = target.lower()
+        target = str(target).lower()
         for value in self.value:
             if str(value).lower() in target:
                 return True
@@ -104,7 +104,7 @@ class ConfigFilter:
 
     def _filter_REGEXP(self, data):
         for key in self.key:
-            target = str(DictQuery(data).get(key, ''))
+            target = DictQuery(data).get(key, '')
             if isinstance(target, list):
                 for t in target:
                     if self.__check_regexp(t):
@@ -116,7 +116,7 @@ class ConfigFilter:
 
     def __check_regexp(self, target):
         for value in self.value:
-            if re.search(value, target, re.I | re.M):
+            if re.search(value, str(target), re.I | re.M):
                 return True
         return False
 
@@ -166,7 +166,7 @@ class ConfigFilter:
 
     def _filter_DOMAIN(self, data):
         for key in self.key:
-            target = str(DictQuery(data).get(key, ''))
+            target = DictQuery(data).get(key, '')
             if isinstance(target, list):
                 for t in target:
                     if self.__check_domain(t):
@@ -177,7 +177,7 @@ class ConfigFilter:
         return False
 
     def __check_domain(self, target):
-        target = target.lower()
+        target = str(target).lower()
         for value in self.value:
             value = str(value).lower()
             if target == value or target.endswith('.' + value):
@@ -199,7 +199,7 @@ class ConfigFilter:
     def __number_comparator(self, data, comparator):
         # Wrapper for filters GREATER, LESS, GREATER_EQ, LESS_EQ
         for key in self.key:
-            target = str(DictQuery(data).get(key, ''))
+            target = DictQuery(data).get(key, '')
             if not target:
                 return False
             if isinstance(target, list):
@@ -208,13 +208,13 @@ class ConfigFilter:
                         if comparator(float(t)):
                             return True
                     except ValueError:
-                        raise ValueError(f"Invalid target in GREATER filter: {t} is not integer")
+                        raise ValueError(f"Invalid target in GREATER filter: {t} is not float")
             else:
                 try:
                     if comparator(float(target)):
                         return True
                 except ValueError:
-                    raise ValueError(f"Invalid target in GREATER filter: {target} is not integer")
+                    raise ValueError(f"Invalid target in GREATER filter: {target} is not float")
         return False
 
     def __check_greater(self, target):

@@ -26,6 +26,7 @@ class RoutingTestCase(unittest.TestCase):
     test_event_6 = load_test_data("test_event_6")
     test_event_7 = load_test_data("test_event_7")
     test_event_with_list_1 = load_test_data("test_event_with_list_1")
+    test_event_with_list_2 = load_test_data("test_event_with_list_2")
 
     def setUp(self):
         self.routing = Routing()
@@ -178,3 +179,6 @@ class RoutingTestCase(unittest.TestCase):
     def test_event_with_lists_as_fields(self):
         self.routing.load_from_dicts([load_test_data("test_rule_9_network")])  # NETWORK
         self.assertTrue(self.routing.match(self.test_event_with_list_1))
+
+        self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
+        self.assertTrue(self.routing.match(self.test_event_with_list_2))
