@@ -83,6 +83,26 @@ class ConfigFilter:
                 return True
         return False
 
+    def _filter_ENDSWITH(self, data):
+        for key in self.key:
+            target = DictQuery(data).get(key, '')
+            if isinstance(target, list):
+                for t in target:
+                    if self.__check_endswith(t):
+                        return True
+            else:
+                if self.__check_endswith(target):
+                    return True
+        return False
+
+    def __check_endswith(self, target):
+        target = str(target).lower()
+        for value in self.value:
+            if target.endswith(str(value).lower()):
+                return True
+        return False
+
+
     def _filter_KEYWORD(self, data):
         for key in self.key:
             target = DictQuery(data).get(key, '')

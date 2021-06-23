@@ -25,6 +25,7 @@ class RoutingTestCase(unittest.TestCase):
     test_event_5 = load_test_data("test_event_5")
     test_event_6 = load_test_data("test_event_6")
     test_event_7 = load_test_data("test_event_7")
+    test_event_8 = load_test_data("test_event_8")
     test_event_with_list_1 = load_test_data("test_event_with_list_1")
     test_event_with_list_2 = load_test_data("test_event_with_list_2")
 
@@ -175,6 +176,10 @@ class RoutingTestCase(unittest.TestCase):
         self.routing.load_from_dicts([load_test_data("test_rule_13_less")])  # LESS
         self.assertFalse(self.routing.match(self.test_event_1))
         self.assertTrue(self.routing.match(self.test_event_3))
+        self.routing.load_from_dicts([load_test_data("test_rule_14_endswith")])  # ENDSSWITH
+        self.assertTrue(self.routing.match(self.test_event_1))
+        self.assertFalse(self.routing.match(self.test_event_3))
+        self.assertFalse(self.routing.match(self.test_event_8))
 
     def test_event_with_lists_as_fields(self):
         self.routing.load_from_dicts([load_test_data("test_rule_9_network")])  # NETWORK
