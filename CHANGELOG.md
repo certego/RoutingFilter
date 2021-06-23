@@ -1,4 +1,8 @@
 ## 1.0.x
+### 1.2.0
+#### Features
+* Implemented ENDSWITH filter
+
 ### 1.1.7
 #### Bugfix
 * Fixed routing matching when source key is a list.

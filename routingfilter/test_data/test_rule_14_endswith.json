@@ -1,0 +1,24 @@
+{
+  "streams": {
+    "rules": {
+      "mountain_bike": [
+        {
+          "filters": [
+            {
+              "type": "ENDSWITH",
+              "key": "wheel_model",
+              "value": [
+                "light"
+              ]
+            }
+          ],
+          "streams": {
+            "Workshop": {
+              "workers_needed": 1
+            }
+          }
+        }
+      ]
+    }
+  }
+}
