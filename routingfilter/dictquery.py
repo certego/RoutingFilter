@@ -1,14 +1,41 @@
 class DictQuery(dict):
-    """https://www.haykranen.nl/2016/02/13/handling-complex-nested-dicts-in-python/"""
+
+    # https://www.haykranen.nl/2016/02/13/handling-complex-nested-dicts-in-python/
 
     def get(self, path, default=None):
-        # In some very weird cases we can have a dict key written like "foo.bar"
-        # If it exists we do not traverse the dictionary
+        """Reimplement get method to walk the path on a dictionary.
+
+        Keep in mind if the dictionary contains a key with a ``.`` inside it will be matched first. Example:
+
+        ::
+
+            mydict = {
+                "foo.bar": 42,
+                "foo": {
+                    "bar": 1,
+                    "baz": "hello"
+                }
+            }
+
+            mydictquery = DictQuery(mydict)
+            mydictquery.get("foo.bar") # returns 42
+            mydictquery.get("foo.baz") # returns hello
+
+
+        :param path: path to match
+        :type path: string
+        :param default: default return value, defaults to None
+        :type default: obj, optional
+        :return: matched values or None
+        :rtype: obj
+        """
         value = dict.get(self, path)
         if value:
             return value
-        keys = path.split('.')
+
+        keys = path.split(".")
         value = None
+
         try:
             for key in keys:
                 if value:
@@ -22,7 +49,21 @@ class DictQuery(dict):
                 if not value:
                     break
         except AttributeError:
-            # If dict is like this { "foobar": 1} and path is foobar.test it would generate
-            # an AttributeError. We manage this case like a failed match
+            # This happens when dictionary contains a field the partially overlaps with path
+            # ES: mydict = { "source": "foobar"} path = "source.ip"
+            # The for above searches for "source" and value became "foobar", then it tries to do "foobar".get("ip")
+            # but foobar is not a dictionary and it fails.
+            # We set value to None because the searched path ("source.ip") is not present on mydict
             value = default
+
         return value
+
+    def set(self, path, value):
+        keys = path.split(".")
+
+        key = keys.pop()
+        tmp = {key: value}
+        while keys:
+            key = keys.pop()
+            tmp = {key: tmp}
+        self.update(tmp)

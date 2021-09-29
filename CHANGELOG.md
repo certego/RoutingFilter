@@ -1,4 +1,7 @@
 ## 1.0.x
+### 1.2.1
+#### Bugfix
+* Fixed a routingfilter bug
 ### 1.2.0
 #### Features
 * Implemented ENDSWITH filter
