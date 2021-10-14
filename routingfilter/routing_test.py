@@ -26,6 +26,8 @@ class RoutingTestCase(unittest.TestCase):
     test_event_6 = load_test_data("test_event_6")
     test_event_7 = load_test_data("test_event_7")
     test_event_8 = load_test_data("test_event_8")
+    test_event_9 = load_test_data("test_event_9")
+    test_event_10 = load_test_data("test_event_10")
     test_event_with_list_1 = load_test_data("test_event_with_list_1")
     test_event_with_list_2 = load_test_data("test_event_with_list_2")
 
@@ -133,15 +135,12 @@ class RoutingTestCase(unittest.TestCase):
         self.assertFalse(self.routing.match(self.test_event_2))
         self.assertTrue(self.routing.match(self.test_event_3))
         self.assertFalse(self.routing.match(self.test_event_4))
-        self.routing.load_from_dicts([load_test_data("test_rule_5_exists")])  # EXISTS
-        self.assertTrue(self.routing.match(self.test_event_1))
-        self.assertFalse(self.routing.match(self.test_event_3))
-        self.routing.load_from_dicts([load_test_data("test_rule_6_not_exists")])  # NOT_EXISTS
-        self.assertFalse(self.routing.match(self.test_event_1))
-        self.assertTrue(self.routing.match(self.test_event_3))
         self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])  # EQUALS
         self.assertTrue(self.routing.match(self.test_event_1))
-        self.assertFalse(self.routing.match(self.test_event_2))
+        self.assertFalse(self.routing.match(self.test_event_3))
+        self.routing.load_from_dicts([load_test_data("test_rule_1_not_equals")])  # NOT EQUALS
+        self.assertFalse(self.routing.match(self.test_event_1))
+        self.assertTrue(self.routing.match(self.test_event_3))
         self.routing.load_from_dicts([load_test_data("test_rule_6_startswith")])  # STARTSWITH
         self.assertTrue(self.routing.match(self.test_event_1))
         self.assertFalse(self.routing.match(self.test_event_3))
@@ -151,16 +150,6 @@ class RoutingTestCase(unittest.TestCase):
         self.routing.load_from_dicts([load_test_data("test_rule_8_regexp")])  # REGEXP
         self.assertTrue(self.routing.match(self.test_event_1))
         self.assertFalse(self.routing.match(self.test_event_3))
-        self.routing.load_from_dicts([load_test_data("test_rule_9_network")])  # NETWORK
-        self.assertTrue(self.routing.match(self.test_event_4))
-        self.assertFalse(self.routing.match(self.test_event_5))
-        with self.assertRaises(ValueError):
-            self.routing.match(self.test_event_6)
-        self.routing.load_from_dicts([load_test_data("test_rule_10_not_network")])  # NOT_NETWORK
-        self.assertFalse(self.routing.match(self.test_event_4))
-        self.assertTrue(self.routing.match(self.test_event_5))
-        with self.assertRaises(ValueError):
-            self.routing.match(self.test_event_6)
         self.routing.load_from_dicts([load_test_data("test_rule_11_domain")])  # DOMAIN
         self.assertTrue(self.routing.match(self.test_event_4))
         self.assertFalse(self.routing.match(self.test_event_5))
@@ -180,6 +169,31 @@ class RoutingTestCase(unittest.TestCase):
         self.assertTrue(self.routing.match(self.test_event_1))
         self.assertFalse(self.routing.match(self.test_event_3))
         self.assertFalse(self.routing.match(self.test_event_8))
+
+    def test_single_filter_EXIST_NOT_EXISTS(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_5_exists")])  # EXISTS
+        self.assertTrue(self.routing.match(self.test_event_1))
+        self.assertFalse(self.routing.match(self.test_event_3))
+        self.assertTrue(self.routing.match(self.test_event_10))
+        self.routing.load_from_dicts([load_test_data("test_rule_6_not_exists")])  # NOT_EXISTS
+        self.assertFalse(self.routing.match(self.test_event_1))
+        self.assertTrue(self.routing.match(self.test_event_3))
+        self.assertFalse(self.routing.match(self.test_event_10))
+
+    def test_single_filter_NETWORK_NOT_NETWORK(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_9_network")])  # NETWORK
+        self.assertTrue(self.routing.match(self.test_event_4))
+        self.assertFalse(self.routing.match(self.test_event_5))
+        self.assertFalse(self.routing.match(self.test_event_9))
+        with self.assertRaises(ValueError):
+            self.routing.match(self.test_event_6)
+        self.routing.load_from_dicts([load_test_data("test_rule_10_not_network")])  # NOT_NETWORK
+        self.assertFalse(self.routing.match(self.test_event_4))
+        self.assertTrue(self.routing.match(self.test_event_5))
+        self.assertFalse(self.routing.match(self.test_event_3))
+        self.assertTrue(self.routing.match(self.test_event_9))
+        with self.assertRaises(ValueError):
+            self.routing.match(self.test_event_6)
 
     def test_event_with_lists_as_fields(self):
         self.routing.load_from_dicts([load_test_data("test_rule_9_network")])  # NETWORK

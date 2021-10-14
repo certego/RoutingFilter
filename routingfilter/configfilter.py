@@ -45,6 +45,9 @@ class ConfigFilter:
                 return False
         return True
 
+    def _filter_NOT_EQUALS(self, data):
+        return not self._filter_EQUALS(data)
+
     def _filter_EQUALS(self, data):
         for key in self.key:
             target = DictQuery(data).get(key, '')
@@ -101,7 +104,6 @@ class ConfigFilter:
             if target.endswith(str(value).lower()):
                 return True
         return False
-
 
     def _filter_KEYWORD(self, data):
         for key in self.key:
@@ -164,25 +166,7 @@ class ConfigFilter:
         return False
 
     def _filter_NOT_NETWORK(self, data):
-        if not data:
-            return False
-        for key in self.key:
-            target = DictQuery(data).get(key, '0.0.0.0')
-            if isinstance(target, list):
-                for t in target:
-                    # Se fa match anche solo un IP allora ritorno False
-                    if not self.__check_not_network(t):
-                        return False
-            else:
-                if not self.__check_not_network(target):
-                    return False
-        return True
-
-    def __check_not_network(self, target):
-        for value in self.value:
-            if target in IP(value):
-                return False
-        return True
+        return not self._filter_NETWORK(data)
 
     def _filter_DOMAIN(self, data):
         for key in self.key:
