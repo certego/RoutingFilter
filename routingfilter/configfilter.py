@@ -162,7 +162,9 @@ class ConfigFilter:
                 if target in IP(value):
                     return True
             except ValueError:
-                raise ValueError(f"Invalid IP address: {value}")
+                raise ValueError(f"Invalid IP/network address: {value}")
+            except TypeError:
+                self.logger.warning(f"Unparsable IP/network address (wrong type): {value}")
         return False
 
     def _filter_NOT_NETWORK(self, data):
