@@ -8,7 +8,7 @@ from routingfilter.routing import Routing
 
 def load_test_data(name):
     """Load a JSON test file from 'test_data' folder, given its name (extension excluded), and parse it into a dictionary."""
-    with open(os.path.join('routingfilter/test_data', name + '.json')) as file:
+    with open(os.path.join('test_data', name + '.json')) as file:
         data = json.load(file)
     return data
 
