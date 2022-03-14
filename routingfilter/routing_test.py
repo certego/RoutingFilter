@@ -185,15 +185,13 @@ class RoutingTestCase(unittest.TestCase):
         self.assertTrue(self.routing.match(self.test_event_4))
         self.assertFalse(self.routing.match(self.test_event_5))
         self.assertFalse(self.routing.match(self.test_event_9))
-        with self.assertRaises(ValueError):
-            self.routing.match(self.test_event_6)
+        self.assertFalse(self.routing.match(self.test_event_6))  # Unparsable
         self.routing.load_from_dicts([load_test_data("test_rule_10_not_network")])  # NOT_NETWORK
         self.assertFalse(self.routing.match(self.test_event_4))
         self.assertTrue(self.routing.match(self.test_event_5))
         self.assertFalse(self.routing.match(self.test_event_3))
         self.assertTrue(self.routing.match(self.test_event_9))
-        with self.assertRaises(ValueError):
-            self.routing.match(self.test_event_6)
+        self.assertTrue(self.routing.match(self.test_event_6))  # Unparsable
 
     def test_event_with_lists_as_fields(self):
         self.routing.load_from_dicts([load_test_data("test_rule_9_network")])  # NETWORK
