@@ -1,5 +1,5 @@
 ## 1.3.x
-### 1.3.1
+### 1.3.2
 ### Bugfix
 * Fixed another crash in NETWORK filter when an unparsable network/IP is passed and enhanced related logging
 ### 1.3.1
