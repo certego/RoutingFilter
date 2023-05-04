@@ -275,5 +275,11 @@ class ConfigFilter:
                 return True
         return False
     
+    def _filter_TYPEOF_DICT(self, data):
+        for key in self.key:
+            target = DictQuery(data).get(key, '')
+            if type(target) is dict:
+                return True
+        return False
     
 

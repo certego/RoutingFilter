@@ -30,6 +30,7 @@ class RoutingTestCase(unittest.TestCase):
     test_event_10 = load_test_data("test_event_10")
     test_event_11 = load_test_data("test_event_11")
     test_event_12 = load_test_data("test_event_12")
+    test_event_13 = load_test_data("test_event_13")
     test_event_with_list_1 = load_test_data("test_event_with_list_1")
     test_event_with_list_2 = load_test_data("test_event_with_list_2")
 
@@ -225,3 +226,9 @@ class RoutingTestCase(unittest.TestCase):
         self.assertTrue(self.routing.match(self.test_event_10))
         self.assertFalse(self.routing.match(self.test_event_4)) # Field not exists
         self.assertFalse(self.routing.match(self.test_event_11)) # IS_NOT_LIST
+
+    def test_single_filter_TYPEOF_DICT(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_19_typeof_dict")])  # IS_DICT
+        self.assertTrue(self.routing.match(self.test_event_13))
+        self.assertFalse(self.routing.match(self.test_event_4)) # Field not exists
+        self.assertFalse(self.routing.match(self.test_event_11)) # IS_NOT_DICT
