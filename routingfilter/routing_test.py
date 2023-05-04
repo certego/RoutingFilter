@@ -219,3 +219,9 @@ class RoutingTestCase(unittest.TestCase):
         self.assertTrue(self.routing.match(self.test_event_12))
         self.assertFalse(self.routing.match(self.test_event_4)) # Field not exists
         self.assertFalse(self.routing.match(self.test_event_11)) # IS_NOT_BOOL
+
+    def test_single_filter_TYPEOF_LIST(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_18_typeof_list")])  # IS_LIST
+        self.assertTrue(self.routing.match(self.test_event_10))
+        self.assertFalse(self.routing.match(self.test_event_4)) # Field not exists
+        self.assertFalse(self.routing.match(self.test_event_11)) # IS_NOT_LIST
