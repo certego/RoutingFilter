@@ -5,9 +5,10 @@
           {
             "filters": [
               {
-                "type": "TYPEOF_STRING",
+                "type": "TYPEOF",
                 "key": "wheel_model",
-                "description": "Filter to check if a field is a string"
+                "description": "Filter to check the ip field type",
+                "value": "ip"
               }
             ],
             "streams": {

@@ -5,9 +5,10 @@
           {
             "filters": [
               {
-                "type": "TYPEOF_LIST",
+                "type": "TYPEOF",
                 "key": "wheel_model",
-                "description": "Filter to check if a field is a list"
+                "description": "Filter to check the the exception if the value is a list",
+                "value": ["str", "int", "dict"]
               }
             ],
             "streams": {

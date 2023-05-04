@@ -5,9 +5,10 @@
           {
             "filters": [
               {
-                "type": "TYPEOF_INT",
+                "type": "TYPEOF",
                 "key": "wheel_model",
-                "description": "Filter to check if a field is an integer"
+                "description": "Filter to check the int field type",
+                "value": "int"
               }
             ],
             "streams": {

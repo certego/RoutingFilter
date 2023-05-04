@@ -5,9 +5,10 @@
           {
             "filters": [
               {
-                "type": "TYPEOF_DICT",
+                "type": "TYPEOF",
                 "key": "wheel_model",
-                "description": "Filter to check if a field is a dictionary"
+                "description": "Filter to check the string field type",
+                "value": "str"
               }
             ],
             "streams": {

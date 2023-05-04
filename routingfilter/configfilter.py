@@ -247,39 +247,51 @@ class ConfigFilter:
                 return True
         return False
     
-    def _filter_TYPEOF_STRING(self, data):
+    def _filter_TYPEOF(self, data):
+        if len(self.value) != 1:
+            raise ValueError(f"Filter TYPE_OF must have one element as value")
+        value = self.value[0]
         for key in self.key:
             target = DictQuery(data).get(key, '')
-            if type(target) is str:
-                return True
+            if value == "str":
+                if type(target) is str:
+                    return True
+            elif value == "int":
+                if type(target) is int:
+                    return True
+            elif value == "bool":
+                if type(target) is bool:
+                    return True
+            elif value == "list":
+                if type(target) is list:
+                    return True
+            elif value == "dict":
+                if type(target) is dict:
+                    return True
+                return False
+            elif value == "ip":
+                if self.__check_ip_address(target):
+                    return True
+            elif value == "mac":
+                if self.__check_mac_address(target):
+                    return True
+            else:
+                raise ValueError(f"Unsupported type: {self.value}")
         return False
     
-    def _filter_TYPEOF_INT(self, data):
-        for key in self.key:
-            target = DictQuery(data).get(key, '')
-            if type(target) is int:
+    def __check_ip_address(self, target):
+        try: 
+            if type(target) is int or int(target):
+                print("into first if")
+                return False
+        except ValueError:
+            # int(value) raises an exception if it isn't int, so can proceed with the ip check
+            try:
+                ip_addr = IP(target)
                 return True
-        return False
+            except:
+                return False
     
-    def _filter_TYPEOF_BOOL(self, data):
-        for key in self.key:
-            target = DictQuery(data).get(key, '')
-            if type(target) is bool:
-                return True
-        return False
-    
-    def _filter_TYPEOF_LIST(self, data):
-        for key in self.key:
-            target = DictQuery(data).get(key, '')
-            if type(target) is list:
-                return True
-        return False
-    
-    def _filter_TYPEOF_DICT(self, data):
-        for key in self.key:
-            target = DictQuery(data).get(key, '')
-            if type(target) is dict:
-                return True
-        return False
-    
+    def __check_mac_address(self, target):
+        return 0
 

@@ -5,9 +5,10 @@
           {
             "filters": [
               {
-                "type": "TYPEOF_BOOL",
+                "type": "TYPEOF",
                 "key": "wheel_model",
-                "description": "Filter to check if a field is a boolean"
+                "description": "Filter to check the list field type",
+                "value": "list"
               }
             ],
             "streams": {

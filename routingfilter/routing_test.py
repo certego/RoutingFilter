@@ -31,6 +31,8 @@ class RoutingTestCase(unittest.TestCase):
     test_event_11 = load_test_data("test_event_11")
     test_event_12 = load_test_data("test_event_12")
     test_event_13 = load_test_data("test_event_13")
+    test_event_14 = load_test_data("test_event_14")
+    test_event_15 = load_test_data("test_event_15")
     test_event_with_list_1 = load_test_data("test_event_with_list_1")
     test_event_with_list_2 = load_test_data("test_event_with_list_2")
 
@@ -203,32 +205,31 @@ class RoutingTestCase(unittest.TestCase):
         self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
         self.assertTrue(self.routing.match(self.test_event_with_list_2))
 
-    def test_single_filter_TYPEOF_STRING(self):
-        self.routing.load_from_dicts([load_test_data("test_rule_15_typeof_string")])  # IS_STRING
-        self.assertTrue(self.routing.match(self.test_event_1))
-        self.assertFalse(self.routing.match(self.test_event_4))     # Field not exists
-        self.assertFalse(self.routing.match(self.test_event_10))    # IS_NOT_STRING
+    def test_single_filter_TYPEOF(self):
+        # if self.value is a list, it raises an exception with any event
+        with self.assertRaises(ValueError):
+            self.routing.load_from_dicts([load_test_data("test_rule_15_typeof_exception")])
 
-    def test_single_filter_TYPEOF_INT(self):
-        self.routing.load_from_dicts([load_test_data("test_rule_16_typeof_int")])   # IS_INT
+        self.routing.load_from_dicts([load_test_data("test_rule_16_typeof_str")])   # is_str
+        self.assertTrue(self.routing.match(self.test_event_8))
+        self.assertFalse(self.routing.match(self.test_event_10))    # is_not_str
+        self.routing.load_from_dicts([load_test_data("test_rule_17_typeof_int")])   # is_int
         self.assertTrue(self.routing.match(self.test_event_11))
-        self.assertFalse(self.routing.match(self.test_event_4)) # Field not exists
-        self.assertFalse(self.routing.match(self.test_event_10))    # IS_NOT_INT
-
-    def test_single_filter_TYPEOF_BOOL(self):
-        self.routing.load_from_dicts([load_test_data("test_rule_17_typeof_bool")])   # IS_BOOL
+        self.assertFalse(self.routing.match(self.test_event_8))     # is_not_int
+        self.routing.load_from_dicts([load_test_data("test_rule_18_typeof_bool")])   # is_bool
         self.assertTrue(self.routing.match(self.test_event_12))
-        self.assertFalse(self.routing.match(self.test_event_4)) # Field not exists
-        self.assertFalse(self.routing.match(self.test_event_11)) # IS_NOT_BOOL
-
-    def test_single_filter_TYPEOF_LIST(self):
-        self.routing.load_from_dicts([load_test_data("test_rule_18_typeof_list")])  # IS_LIST
+        self.assertFalse(self.routing.match(self.test_event_8))     # is_not_bool
+        self.routing.load_from_dicts([load_test_data("test_rule_19_typeof_list")])  # is_list
         self.assertTrue(self.routing.match(self.test_event_10))
-        self.assertFalse(self.routing.match(self.test_event_4)) # Field not exists
-        self.assertFalse(self.routing.match(self.test_event_11)) # IS_NOT_LIST
-
-    def test_single_filter_TYPEOF_DICT(self):
-        self.routing.load_from_dicts([load_test_data("test_rule_19_typeof_dict")])  # IS_DICT
+        self.assertFalse(self.routing.match(self.test_event_8))    # is_not_list
+        self.routing.load_from_dicts([load_test_data("test_rule_20_typeof_dict")])  # is_dict
         self.assertTrue(self.routing.match(self.test_event_13))
-        self.assertFalse(self.routing.match(self.test_event_4)) # Field not exists
-        self.assertFalse(self.routing.match(self.test_event_11)) # IS_NOT_DICT
+        self.assertFalse(self.routing.match(self.test_event_11))    # is_not_dict
+        self.routing.load_from_dicts([load_test_data("test_rule_21_typeof_ip")])  # is_ip
+        self.assertTrue(self.routing.match(self.test_event_15))
+        self.assertFalse(self.routing.match(self.test_event_11))    # insert an integer
+        self.assertFalse(self.routing.match(self.test_event_14))    # insert a string with a number: ex. "8"
+        self.assertFalse(self.routing.match(self.test_event_12))    # is_not_ip
+
+        # key doesn't exist
+        self.assertFalse(self.routing.match(self.test_event_5))
