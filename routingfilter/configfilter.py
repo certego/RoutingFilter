@@ -246,3 +246,12 @@ class ConfigFilter:
             if target <= float(value):
                 return True
         return False
+    
+    def _filter_TYPEOF_STRING(self, data):
+        for key in self.key:
+            target = DictQuery(data).get(key, '')
+            if type(target) is str:
+                return True
+        return False
+    
+

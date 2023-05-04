@@ -199,3 +199,9 @@ class RoutingTestCase(unittest.TestCase):
 
         self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
         self.assertTrue(self.routing.match(self.test_event_with_list_2))
+
+    def test_single_filter_TYPEOF_STRING(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_15_typeof_string")])  # IS_STRING
+        self.assertTrue(self.routing.match(self.test_event_1))
+        self.assertFalse(self.routing.match(self.test_event_4))     # Field not exists
+        self.assertFalse(self.routing.match(self.test_event_10))    # IS_NOT_STRING
