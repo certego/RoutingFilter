@@ -28,6 +28,7 @@ class RoutingTestCase(unittest.TestCase):
     test_event_8 = load_test_data("test_event_8")
     test_event_9 = load_test_data("test_event_9")
     test_event_10 = load_test_data("test_event_10")
+    test_event_11 = load_test_data("test_event_11")
     test_event_with_list_1 = load_test_data("test_event_with_list_1")
     test_event_with_list_2 = load_test_data("test_event_with_list_2")
 
@@ -205,3 +206,11 @@ class RoutingTestCase(unittest.TestCase):
         self.assertTrue(self.routing.match(self.test_event_1))
         self.assertFalse(self.routing.match(self.test_event_4))     # Field not exists
         self.assertFalse(self.routing.match(self.test_event_10))    # IS_NOT_STRING
+
+    def test_single_filter_TYPEOF_INT(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_16_typeof_int")])   # IS_INT
+        self.assertTrue(self.routing.match(self.test_event_11))
+        self.assertFalse(self.routing.match(self.test_event_4)) # Field not exists
+        self.assertFalse(self.routing.match(self.test_event_10))    # IS_NOT_INT
+
+        # is list event_10
