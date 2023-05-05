@@ -208,10 +208,12 @@ class RoutingTestCase(unittest.TestCase):
         self.assertTrue(self.routing.match(self.test_event_with_list_2))
 
     def test_single_filter_TYPEOF(self):
-        # if self.value is a list, it raises an exception with any event
-        with self.assertRaises(ValueError):
-            self.routing.load_from_dicts([load_test_data("test_rule_15_typeof_exception")])
-
+        # if self.value is a list, it returns True if almost one type is correct
+        self.routing.load_from_dicts([load_test_data("test_rule_15_typeof_exception")]) # "value": ["str", "int", "dict"]
+        self.assertTrue(self.routing.match(self.test_event_8))      # value: "str"
+        self.assertTrue(self.routing.match(self.test_event_11))     # value: "int"
+        self.assertTrue(self.routing.match(self.test_event_13))     # value: "dict"
+        self.assertFalse(self.routing.match(self.test_event_12))
         self.routing.load_from_dicts([load_test_data("test_rule_16_typeof_str")])   # is_str
         self.assertTrue(self.routing.match(self.test_event_8))
         self.assertFalse(self.routing.match(self.test_event_10))    # is_not_str

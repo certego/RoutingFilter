@@ -248,28 +248,42 @@ class ConfigFilter:
                 return True
         return False
     
+    # def _filter_TYPEOF(self, data):
+    #     for key in self.key:
+    #         target = DictQuery(data).get(key, '')
+    #         if isinstance(target, list):
+    #             for t in target:
+    #                 if self.__check_typeof(t):
+    #                     return True
+    #         else:
+    #             if self.__check_typeof(target):
+    #                 return True
+    #     return False
+
     def _filter_TYPEOF(self, data):
-        if len(self.value) != 1:
-            raise ValueError(f"Filter TYPE_OF must have one element as value")
         value = self.value[0]
         for key in self.key:
             target = DictQuery(data).get(key, '')
-            if value == "str":
-                return type(target) is str
-            elif value == "int":
-                return type(target) is int
-            elif value == "bool":
-                return type(target) is bool
-            elif value == "list":
-                return type(target) is list
-            elif value == "dict":
-                return type(target) is dict
-            elif value == "ip":
-                return self.__check_ip_address(target)
-            elif value == "mac":
-                return self.__check_mac_address(target)
-            else:
-                raise ValueError(f"Unsupported type: {self.value}")
+            for value in self.value:
+                if self.__check_typeof(target, value):
+                    return True
+        return False
+    
+    def __check_typeof(self, target, value):
+        if value == "str":
+            return type(target) is str
+        elif value == "int":
+            return type(target) is int
+        elif value == "bool":
+            return type(target) is bool
+        elif value == "list":
+            return type(target) is list
+        elif value == "dict":
+            return type(target) is dict
+        elif value == "ip":
+            return self.__check_ip_address(target)
+        elif value == "mac":
+            return self.__check_mac_address(target)
         return False
     
     def __check_ip_address(self, target):
