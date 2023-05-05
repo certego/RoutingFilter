@@ -1,2 +1,3 @@
 setuptools~=67.7.2
 IPy~=1.1
+macaddress~=2.0.2
