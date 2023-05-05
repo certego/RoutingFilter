@@ -1,0 +1,22 @@
+{
+    "streams": {
+      "rules": {
+        "ip_traffic": [
+          {
+            "filters": [
+              {
+                "type": "NETWORK",
+                "key": "src_addr",
+                "value": "$INTERNAL_IPS"
+              }
+            ],
+            "streams": {
+              "Workshop": {
+                "workers_needed": 1
+              }
+            }
+          }
+        ]
+      }
+    }
+  }

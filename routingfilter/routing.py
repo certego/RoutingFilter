@@ -9,6 +9,7 @@ class Routing:
 
     def __init__(self):
         self.rules = None
+        self.variables = {}
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def get_rules(self):
@@ -64,8 +65,12 @@ class Routing:
             for tag_field_name in msg_tags:
                 for rule in self.rules[type_]["rules"].get(tag_field_name, []):
                     # check if ALL the filters are matching
-                    filters = [ConfigFilter(f) for f in rule.get("filters", [])]
-                    if filters and all(f.is_matching(event) for f in filters):
+                    filters = rule.get("filters", [])
+                    for i,f in enumerate(filters):
+                        if f.get("value").startswith("$"):
+                            filters[i]["value"] = self._substitute_variables(f["value"])
+                    config_filters = [ConfigFilter(f) for f in filters]
+                    if config_filters and all(f.is_matching(event) for f in config_filters):
                         matching_rules.append(rule)
                         break  # the first matching rule wins
         # Rename "filters" to "rules" and "type" to "output" to be more generic
@@ -138,3 +143,13 @@ class Routing:
                     for filter_ in filter_output["filters"]:
                         config_filter_obj = ConfigFilter(filter_)
                         config_filter_obj.is_matching({})
+
+    def load_variables(self, dict_var):
+        self.variables = dict_var
+
+    def _substitute_variables(self, value):
+        if value in self.variables:
+            return self.variables[value]
+        else:
+            self.logger.warning(f"Variable {value} doesn't exist in variables dictionary")
+            return ""

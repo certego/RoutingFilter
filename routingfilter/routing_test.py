@@ -240,3 +240,11 @@ class RoutingTestCase(unittest.TestCase):
         self.assertFalse(self.routing.match(self.test_event_16))    # is_not_mac
         # key doesn't exist
         self.assertFalse(self.routing.match(self.test_event_5))
+
+    def test_variables(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_23_network_variables")])
+        print(self.routing.match(self.test_event_4))
+        self.assertFalse(self.routing.match(self.test_event_4))
+        var_dict = { "$INTERNAL_IPS": ["127.0.0.1/32","192.168.0.0/16"]}
+        self.routing.load_variables(var_dict)
+        self.assertTrue(self.routing.match(self.test_event_4))
