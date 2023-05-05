@@ -255,27 +255,19 @@ class ConfigFilter:
         for key in self.key:
             target = DictQuery(data).get(key, '')
             if value == "str":
-                if type(target) is str:
-                    return True
+                return type(target) is str
             elif value == "int":
-                if type(target) is int:
-                    return True
+                return type(target) is int
             elif value == "bool":
-                if type(target) is bool:
-                    return True
+                return type(target) is bool
             elif value == "list":
-                if type(target) is list:
-                    return True
+                return type(target) is list
             elif value == "dict":
-                if type(target) is dict:
-                    return True
-                return False
+                return type(target) is dict
             elif value == "ip":
-                if self.__check_ip_address(target):
-                    return True
+                return self.__check_ip_address(target)
             elif value == "mac":
-                if self.__check_mac_address(target):
-                    return True
+                return self.__check_mac_address(target)
             else:
                 raise ValueError(f"Unsupported type: {self.value}")
         return False
