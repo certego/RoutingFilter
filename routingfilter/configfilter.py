@@ -3,6 +3,7 @@ import logging
 
 from routingfilter.dictquery import DictQuery
 from IPy import IP
+import macaddress
 
 
 class ConfigFilter:
@@ -282,16 +283,21 @@ class ConfigFilter:
     def __check_ip_address(self, target):
         try: 
             if type(target) is int or int(target):
-                print("into first if")
                 return False
         except ValueError:
             # int(value) raises an exception if it isn't int, so can proceed with the ip check
             try:
-                ip_addr = IP(target)
+                IP(target)
                 return True
             except:
                 return False
     
     def __check_mac_address(self, target):
-        return 0
+        if type(target) is int:
+            return False
+        try:
+            macaddress.EUI48(target)
+            return True
+        except ValueError:
+            return False
 

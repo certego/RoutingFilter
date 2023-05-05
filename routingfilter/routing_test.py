@@ -33,6 +33,8 @@ class RoutingTestCase(unittest.TestCase):
     test_event_13 = load_test_data("test_event_13")
     test_event_14 = load_test_data("test_event_14")
     test_event_15 = load_test_data("test_event_15")
+    test_event_16 = load_test_data("test_event_16")
+    test_event_17 = load_test_data("test_event_17")
     test_event_with_list_1 = load_test_data("test_event_with_list_1")
     test_event_with_list_2 = load_test_data("test_event_with_list_2")
 
@@ -225,11 +227,14 @@ class RoutingTestCase(unittest.TestCase):
         self.routing.load_from_dicts([load_test_data("test_rule_20_typeof_dict")])  # is_dict
         self.assertTrue(self.routing.match(self.test_event_13))
         self.assertFalse(self.routing.match(self.test_event_11))    # is_not_dict
-        self.routing.load_from_dicts([load_test_data("test_rule_21_typeof_ip")])  # is_ip
+        self.routing.load_from_dicts([load_test_data("test_rule_21_typeof_ip")])  # is_ipv4
         self.assertTrue(self.routing.match(self.test_event_15))
+        self.assertTrue(self.routing.match(self.test_event_16))     # is_ipv6
         self.assertFalse(self.routing.match(self.test_event_11))    # insert an integer
         self.assertFalse(self.routing.match(self.test_event_14))    # insert a string with a number: ex. "8"
         self.assertFalse(self.routing.match(self.test_event_12))    # is_not_ip
-
+        self.routing.load_from_dicts([load_test_data("test_rule_22_typeof_mac")])    # is_mac
+        self.assertTrue(self.routing.match(self.test_event_17))
+        self.assertFalse(self.routing.match(self.test_event_16))    # is_not_mac
         # key doesn't exist
         self.assertFalse(self.routing.match(self.test_event_5))
