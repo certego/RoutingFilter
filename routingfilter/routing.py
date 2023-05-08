@@ -130,6 +130,17 @@ class Routing:
             raise ValueError("'rules_list' must be a list of JSON strings containing the routing rules!")
         self.load_from_dicts(json.loads(rules_list), validate_rules)
 
+    def load_variables(self, dict_var):
+        self.variables = dict_var
+
+    def _substitute_variables(self, value):
+        if value in self.variables:
+            return self.variables[value]
+        else:
+            self.logger.warning(f"Variable {value} doesn't exist in variables dictionary")
+            #Returning variable name (ES: $INTERNAL_IPS)
+            return value
+
     def _validate_rules(self, rules):
         """Validate the loaded rules, checking for type mismatch errors.
 
@@ -143,13 +154,3 @@ class Routing:
                     for filter_ in filter_output["filters"]:
                         config_filter_obj = ConfigFilter(filter_)
                         config_filter_obj.is_matching({})
-
-    def load_variables(self, dict_var):
-        self.variables = dict_var
-
-    def _substitute_variables(self, value):
-        if value in self.variables:
-            return self.variables[value]
-        else:
-            self.logger.warning(f"Variable {value} doesn't exist in variables dictionary")
-            return ""
