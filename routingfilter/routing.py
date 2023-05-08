@@ -67,7 +67,7 @@ class Routing:
                     # check if ALL the filters are matching
                     filters = rule.get("filters", [])
                     for i,f in enumerate(filters):
-                        if f.get("value").startswith("$"):
+                        if isinstance(f.get("value"), str) and f.get("value").startswith("$"):
                             filters[i]["value"] = self._substitute_variables(f["value"])
                     config_filters = [ConfigFilter(f) for f in filters]
                     if config_filters and all(f.is_matching(event) for f in config_filters):

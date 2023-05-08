@@ -5,7 +5,7 @@ with open("README.md", "r") as readme_file:
 
 setup(
     name='routingfilter',
-    version='1.3.2',
+    version='1.4.0',
     packages=['routingfilter'],
     include_package_data=True,
     install_requires=["IPy"],
@@ -22,5 +22,5 @@ setup(
         'Programming Language :: Python :: 3',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
-    python_requires='>=3.6'
+    python_requires='>=3.8'
 )
