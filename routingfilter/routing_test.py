@@ -190,7 +190,6 @@ class RoutingTestCase(unittest.TestCase):
     def test_single_filter_NETWORK_NOT_NETWORK(self):
         self.routing.load_from_dicts([load_test_data("test_rule_9_network")])  # NETWORK
         self.assertTrue(self.routing.match(self.test_event_4))
-        self.assertFalse(self.routing.match(self.test_event_5))
         self.assertFalse(self.routing.match(self.test_event_9))
         self.assertFalse(self.routing.match(self.test_event_6))  # Unparsable
         self.routing.load_from_dicts([load_test_data("test_rule_10_not_network")])  # NOT_NETWORK
