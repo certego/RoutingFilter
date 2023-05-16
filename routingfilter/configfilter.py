@@ -247,21 +247,8 @@ class ConfigFilter:
             if target <= float(value):
                 return True
         return False
-    
-    # def _filter_TYPEOF(self, data):
-    #     for key in self.key:
-    #         target = DictQuery(data).get(key, '')
-    #         if isinstance(target, list):
-    #             for t in target:
-    #                 if self.__check_typeof(t):
-    #                     return True
-    #         else:
-    #             if self.__check_typeof(target):
-    #                 return True
-    #     return False
 
     def _filter_TYPEOF(self, data):
-        value = self.value[0]
         for key in self.key:
             target = DictQuery(data).get(key, '')
             for value in self.value:

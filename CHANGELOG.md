@@ -1,3 +1,9 @@
+## 1.4.x
+### 1.4.0
+#### Features
+* Added filters: IS_STR, IS_INT, IS_BOOL; IS_LIST, IS_DICT, TYPEOF
+* Implemented the use of variables in filter values
+
 ## 1.3.x
 ### 1.3.2
 ### Bugfix
