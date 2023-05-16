@@ -82,7 +82,7 @@ class Routing:
                 mr["output"] = mr.pop(type_)
         return matching_rules
 
-    def load_from_dicts(self, rules_list, validate_rules=True):
+    def load_from_dicts(self, rules_list, validate_rules=True, variables=None):
         """Load routing configuration from a dictionary. It merges the different rules in list into a single routing rule.
         It optionally performs some rules validation before accepting them (an exception is raised in case of errors).
 
@@ -90,8 +90,12 @@ class Routing:
         :type rules_list: list[dict]
         :param validate_rules: Perform rules validation (default=True). It can be disabled to improve performance (unsafe)
         :type validate_rules: bool
+        :param variables: Variables dictionary to replace rule values
+        :type variables: dict
         """
-        self.logger.debug(f"Attempting to load rules_list: {rules_list}")
+        self.logger.debug(f"Attempting to load rules_list: {rules_list}, variables: {variables}")
+        if variables:
+            self.variables = variables
         if not rules_list:
             self.logger.warning("An empty rules_list has been passed. Makes sure this is intentional.")
             self.rules = {}
@@ -116,7 +120,7 @@ class Routing:
             self._validate_rules(merged_rules)
         self.rules = merged_rules
 
-    def load_from_jsons(self, rules_list, validate_rules=True):
+    def load_from_jsons(self, rules_list, validate_rules=True, variables=None):
         """Load routing configuration from JSON data. It merges the different rules in list into a single routing rule.
         It optionally performs some rules validation before accepting them (an exception is raised in case of errors).
 
@@ -124,14 +128,13 @@ class Routing:
         :type rules_list: list[str]
         :param validate_rules: Perform rules validation (default=True). It can be disabled to improve performance (unsafe)
         :type validate_rules: bool
+        :param variables: Variables dictionary to replace rule values
+        :type variables: dict
         """
         if not isinstance(rules_list, str):
             self.logger.error("'rules_list' must be a list of JSON strings containing the routing rules!")
             raise ValueError("'rules_list' must be a list of JSON strings containing the routing rules!")
-        self.load_from_dicts(json.loads(rules_list), validate_rules)
-
-    def load_variables(self, dict_var):
-        self.variables = dict_var
+        self.load_from_dicts(json.loads(rules_list), validate_rules, variables)
 
     def _substitute_variables(self, value):
         if value in self.variables:
