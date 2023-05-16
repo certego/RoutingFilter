@@ -65,11 +65,7 @@ class Routing:
             for tag_field_name in msg_tags:
                 for rule in self.rules[type_]["rules"].get(tag_field_name, []):
                     # check if ALL the filters are matching
-                    filters = rule.get("filters", [])
-                    for i,f in enumerate(filters):
-                        if isinstance(f.get("value"), str) and f.get("value").startswith("$"):
-                            filters[i]["value"] = self._substitute_variables(f["value"])
-                    config_filters = [ConfigFilter(f) for f in filters]
+                    config_filters = [ConfigFilter(f) for f in rule.get("filters", [])]
                     if config_filters and all(f.is_matching(event) for f in config_filters):
                         matching_rules.append(rule)
                         break  # the first matching rule wins
@@ -103,6 +99,13 @@ class Routing:
         if not isinstance(rules_list, list):
             self.logger.error("'rules_list' must be a list of dicts containing the routing rules!")
             raise ValueError("'rules_list' must be a list of dicts containing the routing rules!")
+        if variables:  # Substitute variables for each filter
+            for orig_rule in rules_list:
+                for type_ in orig_rule.keys():
+                    for tag in orig_rule[type_]["rules"].keys():
+                        for filter_list in orig_rule[type_]["rules"][tag]:
+                            for filter_ in filter_list["filters"]:
+                                filter_["value"] = self._substitute_variables(filter_["value"])
         merged_rules = copy.deepcopy(rules_list[0])
         for orig_rules in rules_list[1:]:
             rules = copy.deepcopy(orig_rules)
@@ -141,8 +144,7 @@ class Routing:
             return self.variables[value]
         else:
             self.logger.warning(f"Variable {value} doesn't exist in variables dictionary")
-            #Returning variable name (ES: $INTERNAL_IPS)
-            return value
+            return value  # Returning variable name (ES: $INTERNAL_IPS)
 
     def _validate_rules(self, rules):
         """Validate the loaded rules, checking for type mismatch errors.
