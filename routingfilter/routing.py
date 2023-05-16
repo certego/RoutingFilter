@@ -3,6 +3,7 @@ import json
 import logging
 
 from routingfilter.configfilter import ConfigFilter
+from typing import List, Optional
 
 
 class Routing:
@@ -12,14 +13,15 @@ class Routing:
         self.variables = {}
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def get_rules(self):
+    def get_rules(self) -> Optional[dict]:
         """Return the currently loaded rules. It is mainly used for debugging purposes.
 
         :return: A dict or None
+        :rtype: Optional[dict]
         """
         return self.rules
 
-    def match(self, event, type_="streams", tag_field_name="tags"):
+    def match(self, event: dict, type_: str = "streams", tag_field_name: str = "tags") -> List[dict]:
         """Process a single event message through routing filters and verify if it matches with (at least) one filter.
         For each top level tag in the rule, only the first matching filter is returned.
         Multiple dictionaries can only be returned with rules matching different tags.
@@ -31,6 +33,7 @@ class Routing:
         :param tag_field_name: The event field to search into (default='tags')
         :type tag_field_name: str
         :return: A list of dicts containing the matched rules and the outputs in the following format: {"rules": [...], "output": {...}}; an empty list if no rule matched
+        :rtype: List[dict]
         """
         if not self.rules:
             self.logger.error("'rules_list' must be set before evaluating a match!")
@@ -78,16 +81,17 @@ class Routing:
                 mr["output"] = mr.pop(type_)
         return matching_rules
 
-    def load_from_dicts(self, rules_list, validate_rules=True, variables=None):
+    def load_from_dicts(self, rules_list: List[dict], validate_rules: bool = True, variables: Optional[dict] = None) -> None:
         """Load routing configuration from a dictionary. It merges the different rules in list into a single routing rule.
         It optionally performs some rules validation before accepting them (an exception is raised in case of errors).
 
         :param rules_list: The configuration
-        :type rules_list: list[dict]
+        :type rules_list: List[dict]
         :param validate_rules: Perform rules validation (default=True). It can be disabled to improve performance (unsafe)
         :type validate_rules: bool
         :param variables: Variables dictionary to replace rule values
-        :type variables: dict
+        :type variables: Optional[dict]
+        :rtype: None
         """
         self.logger.debug(f"Attempting to load rules_list: {rules_list}, variables: {variables}")
         if variables:
@@ -123,34 +127,43 @@ class Routing:
             self._validate_rules(merged_rules)
         self.rules = merged_rules
 
-    def load_from_jsons(self, rules_list, validate_rules=True, variables=None):
+    def load_from_jsons(self, rules_list: List[str], validate_rules: bool = True, variables: Optional[dict] = None) -> None:
         """Load routing configuration from JSON data. It merges the different rules in list into a single routing rule.
         It optionally performs some rules validation before accepting them (an exception is raised in case of errors).
 
         :param rules_list: The json data, which will be parsed into a dict
-        :type rules_list: list[str]
+        :type rules_list: List[str]
         :param validate_rules: Perform rules validation (default=True). It can be disabled to improve performance (unsafe)
         :type validate_rules: bool
         :param variables: Variables dictionary to replace rule values
-        :type variables: dict
+        :type variables: Optional[dict]
+        :rtype: None
         """
         if not isinstance(rules_list, str):
             self.logger.error("'rules_list' must be a list of JSON strings containing the routing rules!")
             raise ValueError("'rules_list' must be a list of JSON strings containing the routing rules!")
         self.load_from_dicts(json.loads(rules_list), validate_rules, variables)
 
-    def _substitute_variables(self, value):
+    def _substitute_variables(self, value: str) -> str:
+        """Map a variable name into its value, if defined in variables dictionary.
+
+        :param value: The variable name
+        :type value: str
+        :return: The variable value or, if not defined, the variable name
+        :rtype: str
+        """
         if value in self.variables:
             return self.variables[value]
         else:
             self.logger.warning(f"Variable {value} doesn't exist in variables dictionary")
             return value  # Returning variable name (ES: $INTERNAL_IPS)
 
-    def _validate_rules(self, rules):
+    def _validate_rules(self, rules: dict) -> None:
         """Validate the loaded rules, checking for type mismatch errors.
 
         :param rules: The merged rules, after loading them from a list of dicts
         :type rules: dict
+        :rtype: None
         """
         self.logger.info("Validating the loaded rules_list")
         for type_ in rules.keys():
