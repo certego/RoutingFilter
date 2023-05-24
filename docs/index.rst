@@ -161,8 +161,8 @@ Indices and tables
 
 Keywords
 ==================
-It is possible to use keywords in the routing, in order to use variables into the filter values. Keywords are strings that start with `$`, for example: $INTERNAL_IPS, $QUALYS_IPS etc.
+It is possible to use keywords in the routing, in order to use variables into the filter values. Keywords are strings that start with `$`, for example: $BICYCLE_COLORS.
 The definition of keywords have to be included in a `.json` file into a `dictionaries` directory, for example: ::
   { 
-    "INTERNAL_IPS": ["127.0.0.1/32","192.168.0.0/16"]
+    "BICYCLE_COLORS": ["red","blue"]
   }
