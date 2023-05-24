@@ -1,0 +1,23 @@
+{
+    "streams": {
+      "rules": {
+        "mountain_bike": [
+          {
+            "filters": [
+              {
+                "type": "TYPEOF",
+                "key": "wheel_model",
+                "description": "Filter to check the the exception if the value type is a list",
+                "value": ["str", "int", "dict"]
+              }
+            ],
+            "streams": {
+              "Workshop": {
+                "workers_needed": 1
+              }
+            }
+          }
+        ]
+      }
+    }
+  }

@@ -3,6 +3,7 @@ import logging
 
 from routingfilter.dictquery import DictQuery
 from IPy import IP
+import macaddress
 
 
 class ConfigFilter:
@@ -246,3 +247,50 @@ class ConfigFilter:
             if target <= float(value):
                 return True
         return False
+
+    def _filter_TYPEOF(self, data):
+        for key in self.key:
+            target = DictQuery(data).get(key, '')
+            for value in self.value:
+                if self.__check_typeof(target, value):
+                    return True
+        return False
+    
+    def __check_typeof(self, target, value):
+        if value == "str":
+            return type(target) is str
+        elif value == "int":
+            return type(target) is int
+        elif value == "bool":
+            return type(target) is bool
+        elif value == "list":
+            return type(target) is list
+        elif value == "dict":
+            return type(target) is dict
+        elif value == "ip":
+            return self.__check_ip_address(target)
+        elif value == "mac":
+            return self.__check_mac_address(target)
+        return False
+    
+    def __check_ip_address(self, target):
+        try: 
+            if type(target) is int or int(target):
+                return False
+        except ValueError:
+            # int(value) raises an exception if it isn't int, so can proceed with the ip check
+            try:
+                IP(target)
+                return True
+            except:
+                return False
+    
+    def __check_mac_address(self, target):
+        if type(target) is int:
+            return False
+        try:
+            macaddress.EUI48(target)
+            return True
+        except ValueError:
+            return False
+

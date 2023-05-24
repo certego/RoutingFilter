@@ -1,0 +1,11 @@
+{
+    "tags": "mountain_bike",
+    "wheel_model": {
+        "model": "Superlight",
+        "inch": 12
+    },
+    "frame": "aluminium",
+    "gears": "1x12",
+    "suspension": "full",
+    "price": 600
+  }

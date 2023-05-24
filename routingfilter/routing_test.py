@@ -28,6 +28,13 @@ class RoutingTestCase(unittest.TestCase):
     test_event_8 = load_test_data("test_event_8")
     test_event_9 = load_test_data("test_event_9")
     test_event_10 = load_test_data("test_event_10")
+    test_event_11 = load_test_data("test_event_11")
+    test_event_12 = load_test_data("test_event_12")
+    test_event_13 = load_test_data("test_event_13")
+    test_event_14 = load_test_data("test_event_14")
+    test_event_15 = load_test_data("test_event_15")
+    test_event_16 = load_test_data("test_event_16")
+    test_event_17 = load_test_data("test_event_17")
     test_event_with_list_1 = load_test_data("test_event_with_list_1")
     test_event_with_list_2 = load_test_data("test_event_with_list_2")
 
@@ -183,7 +190,6 @@ class RoutingTestCase(unittest.TestCase):
     def test_single_filter_NETWORK_NOT_NETWORK(self):
         self.routing.load_from_dicts([load_test_data("test_rule_9_network")])  # NETWORK
         self.assertTrue(self.routing.match(self.test_event_4))
-        self.assertFalse(self.routing.match(self.test_event_5))
         self.assertFalse(self.routing.match(self.test_event_9))
         self.assertFalse(self.routing.match(self.test_event_6))  # Unparsable
         self.routing.load_from_dicts([load_test_data("test_rule_10_not_network")])  # NOT_NETWORK
@@ -199,3 +205,43 @@ class RoutingTestCase(unittest.TestCase):
 
         self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
         self.assertTrue(self.routing.match(self.test_event_with_list_2))
+
+    def test_single_filter_TYPEOF(self):
+        # if self.value is a list, it returns True if almost one type is correct
+        self.routing.load_from_dicts([load_test_data("test_rule_15_typeof_exception")]) # "value": ["str", "int", "dict"]
+        self.assertTrue(self.routing.match(self.test_event_8))      # value: "str"
+        self.assertTrue(self.routing.match(self.test_event_11))     # value: "int"
+        self.assertTrue(self.routing.match(self.test_event_13))     # value: "dict"
+        self.assertFalse(self.routing.match(self.test_event_12))
+        self.routing.load_from_dicts([load_test_data("test_rule_16_typeof_str")])   # is_str
+        self.assertTrue(self.routing.match(self.test_event_8))
+        self.assertFalse(self.routing.match(self.test_event_10))    # is_not_str
+        self.routing.load_from_dicts([load_test_data("test_rule_17_typeof_int")])   # is_int
+        self.assertTrue(self.routing.match(self.test_event_11))
+        self.assertFalse(self.routing.match(self.test_event_8))     # is_not_int
+        self.routing.load_from_dicts([load_test_data("test_rule_18_typeof_bool")])   # is_bool
+        self.assertTrue(self.routing.match(self.test_event_12))
+        self.assertFalse(self.routing.match(self.test_event_8))     # is_not_bool
+        self.routing.load_from_dicts([load_test_data("test_rule_19_typeof_list")])  # is_list
+        self.assertTrue(self.routing.match(self.test_event_10))
+        self.assertFalse(self.routing.match(self.test_event_8))    # is_not_list
+        self.routing.load_from_dicts([load_test_data("test_rule_20_typeof_dict")])  # is_dict
+        self.assertTrue(self.routing.match(self.test_event_13))
+        self.assertFalse(self.routing.match(self.test_event_11))    # is_not_dict
+        self.routing.load_from_dicts([load_test_data("test_rule_21_typeof_ip")])  # is_ipv4
+        self.assertTrue(self.routing.match(self.test_event_15))
+        self.assertTrue(self.routing.match(self.test_event_16))     # is_ipv6
+        self.assertFalse(self.routing.match(self.test_event_11))    # insert an integer
+        self.assertFalse(self.routing.match(self.test_event_14))    # insert a string with a number: ex. "8"
+        self.assertFalse(self.routing.match(self.test_event_12))    # is_not_ip
+        self.routing.load_from_dicts([load_test_data("test_rule_22_typeof_mac")])    # is_mac
+        self.assertTrue(self.routing.match(self.test_event_17))
+        self.assertFalse(self.routing.match(self.test_event_16))    # is_not_mac
+        # key doesn't exist
+        self.assertFalse(self.routing.match(self.test_event_5))
+
+    def test_variables(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_23_network_variables")])
+        self.assertFalse(self.routing.match(self.test_event_4))
+        self.routing.load_from_dicts([load_test_data("test_rule_23_network_variables")], variables={"$INTERNAL_IPS": "192.168.0.0/16"})
+        self.assertTrue(self.routing.match(self.test_event_4))

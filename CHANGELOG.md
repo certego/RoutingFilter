@@ -1,3 +1,9 @@
+## 1.4.x
+### 1.4.0
+#### Features
+* Added filter TYPEOF in order to check if the target is a str, int, bool, list, dict, ip address or mac address
+* Implemented the use of variables in filter values
+
 ## 1.3.x
 ### 1.3.2
 ### Bugfix

@@ -1,0 +1,23 @@
+{
+    "streams": {
+      "rules": {
+        "mountain_bike": [
+          {
+            "filters": [
+              {
+                "type": "TYPEOF",
+                "key": "wheel_model",
+                "description": "Filter to check the string field type",
+                "value": "str"
+              }
+            ],
+            "streams": {
+              "Workshop": {
+                "workers_needed": 1
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
