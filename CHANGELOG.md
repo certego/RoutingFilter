@@ -1,7 +1,7 @@
 ## 1.4.x
 ### 1.4.0
 #### Features
-* Added filters: IS_STR, IS_INT, IS_BOOL; IS_LIST, IS_DICT, TYPEOF
+* Added filter TYPEOF in order to check if the target is a str, int, bool, list, dict, ip address or mac address
 * Implemented the use of variables in filter values
 
 ## 1.3.x

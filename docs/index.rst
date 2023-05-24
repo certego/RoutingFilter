@@ -82,6 +82,7 @@ The chosen logic is OR (at least a match must be satisfied).
 * **LESS** - returns True if the value in the specified "key" is less than "value"
 * **GREATER_EQ** - returns True if the value in the specified "key" is greater than or equal to "value"
 * **LESS_EQ** - returns True if the value in the specified "key" is less than or equal to "value"
+* **TYPE_OF** - returns True if the target type is the same of the value. Possible types checked are: str, int, bool, list, dict, ip address or mac address
 
 The filters NETWORK and NOT_NETWORK must be strings containing a valid IP or network address (using CIDR notation), otherwise a ValueError is raised.
 The filters GREATER, LESS, GREATER_EQ, LESS_EQ require float (or float-parsable) values, otherwise a ValueError is raised.
@@ -157,3 +158,11 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+Keywords
+==================
+It is possible to use keywords in the routing, in order to use variables into the filter values. Keywords are strings that start with `$`, for example: $INTERNAL_IPS, $QUALYS_IPS etc.
+The definition of keywords have to be included in a `.json` file into a `dictionaries` directory, for example: ::
+  { 
+    "INTERNAL_IPS": ["127.0.0.1/32","192.168.0.0/16"]
+  }
