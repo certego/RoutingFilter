@@ -1,4 +1,7 @@
 ## 1.4.x
+### 1.4.1
+#### Bugfix
+* Updated *setup.py* to include new dependency *macaddress* 
 ### 1.4.0
 #### Features
 * Added filter TYPEOF in order to check if the target is a str, int, bool, list, dict, ip address or mac address
