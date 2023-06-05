@@ -186,6 +186,6 @@ class Routing:
         :type rule: dict
         """
         try:
-            return event["certego"]["routing_history"]
+            return event["certego"]["routing_history"][json.dumps(rule)]
         except KeyError:
             return False
