@@ -1,4 +1,5 @@
 import copy
+from datetime import datetime
 import json
 import logging
 
@@ -35,6 +36,7 @@ class Routing:
         :return: A list of dicts containing the matched rules and the outputs in the following format: {"rules": [...], "output": {...}}; an empty list if no rule matched
         :rtype: List[dict]
         """
+        certego = {"routing_history": {}}
         if not self.rules:
             self.logger.error("'rules_list' must be set before evaluating a match!")
             raise ValueError("'rules_list' must be set before evaluating a match!")
@@ -61,9 +63,12 @@ class Routing:
             for rule in rules:
                 # check if ALL the filters are matching
                 filters = [ConfigFilter(f) for f in rule.get("filters", [])]
-                if all(f.is_matching(event) for f in filters):
+                if all(f.is_matching(event) for f in filters):                    
                     matching_rules.append(rule)
-                    break
+                    # break only if the event hasn't been already processed from that output
+                    if not certego["routing_history"].get(type_):
+                        certego["routing_history"][type_] = datetime.now().isoformat()
+                        break
         if not matching_rules:
             for tag_field_name in msg_tags:
                 for rule in self.rules[type_]["rules"].get(tag_field_name, []):
@@ -71,7 +76,9 @@ class Routing:
                     config_filters = [ConfigFilter(f) for f in rule.get("filters", [])]
                     if config_filters and all(f.is_matching(event) for f in config_filters):
                         matching_rules.append(rule)
-                        break  # the first matching rule wins
+                        if not certego["routing_history"].get(type_):
+                            certego["routing_history"][type_] = datetime.now().isoformat()
+                            break  # the first matching rule wins if it doesn't exist in the output field
         # Rename "filters" to "rules" and "type" to "output" to be more generic
         matching_rules = copy.deepcopy(matching_rules)
         for mr in matching_rules:
