@@ -73,6 +73,26 @@ class RoutingTestCase(unittest.TestCase):
         self.routing.load_from_dicts([rule_all])
         self.assertDictEqual(self.routing.match(self.test_event_1)[0]["output"], {'Workshop': {'workers_needed': 1}})
 
+    def test_routing_history(self):
+        wokshop_entries = 0
+        lab_entries = 0
+        self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
+        self.routing.match(self.test_event_1)
+        self.assertTrue(self.test_event_1["certego"]["routing_history"]["Workshop"])
+        # Check if the rule isn't processed twice
+        self.routing.match(self.test_event_1)
+        # New rule has to be parsed
+        self.routing.load_from_dicts([load_test_data("test_rule_24_routing_history")])
+        self.routing.match(self.test_event_1)
+        self.assertTrue(self.test_event_1["certego"]["routing_history"]["Lab"])
+        for key in self.test_event_1["certego"]["routing_history"]:
+            if key == "Workshop":
+                wokshop_entries = wokshop_entries + 1
+            elif key == "Lab":
+                lab_entries = lab_entries + 1
+        self.assertEqual(wokshop_entries, 1)
+        self.assertEqual(lab_entries, 1)
+
     def test_rule_1(self):
         # Test rule loading and applying with full output
         self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
