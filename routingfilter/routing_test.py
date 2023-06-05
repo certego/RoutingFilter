@@ -75,7 +75,7 @@ class RoutingTestCase(unittest.TestCase):
 
     def test_routing_history(self):
         wokshop_entries = 0
-        lab_entries = 0
+        tyrefit_entries = 0
         self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
         self.routing.match(self.test_event_1)
         self.assertTrue(self.test_event_1["certego"]["routing_history"]["Workshop"])
@@ -84,14 +84,15 @@ class RoutingTestCase(unittest.TestCase):
         # New rule has to be parsed
         self.routing.load_from_dicts([load_test_data("test_rule_24_routing_history")])
         self.routing.match(self.test_event_1)
-        self.assertTrue(self.test_event_1["certego"]["routing_history"]["Lab"])
+        print(self.test_event_1)
+        self.assertTrue(self.test_event_1["certego"]["routing_history"]["TyreFit"])
         for key in self.test_event_1["certego"]["routing_history"]:
             if key == "Workshop":
                 wokshop_entries = wokshop_entries + 1
-            elif key == "Lab":
-                lab_entries = lab_entries + 1
+            elif key == "TyreFit":
+                tyrefit_entries = tyrefit_entries + 1
         self.assertEqual(wokshop_entries, 1)
-        self.assertEqual(lab_entries, 1)
+        self.assertEqual(tyrefit_entries, 1)
 
     def test_rule_1(self):
         # Test rule loading and applying with full output
