@@ -332,11 +332,27 @@ class RoutingTestCase(unittest.TestCase):
               }
             ],
             "streams": {
-              "Workshop": {
-                "workers_needed": 1
-              }
             }
           }
-        # regola con streams None e torna false
-        # regola con True
         self.assertFalse(self.routing.rule_in_routing_history(event, rule))
+        event = {"certego": {"routing_history": {"WorkShop": "2023-06-06T18:00:00.000Z"}}}
+        self.assertFalse(self.routing.rule_in_routing_history(event, rule))
+        rule = {
+            "filters": [
+              {
+                "type": "EQUALS",
+                "key": "wheel_model",
+                "description": "Carbon fiber wheels needs manual truing",
+                "value": [
+                  "Superlight",
+                  "RacePro"
+                ]
+              }
+            ],
+            "streams": {
+                "Workshop": {
+                    "workers_needed": 1
+                }
+            }
+          }
+        self.assertTrue(self.routing.rule_in_routing_history(event, rule))
