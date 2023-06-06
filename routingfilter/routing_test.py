@@ -77,14 +77,25 @@ class RoutingTestCase(unittest.TestCase):
         wokshop_entries = 0
         tyrefit_entries = 0
         self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
+        # check that certego.routing_history doesn't exist
+        with self.assertRaises(KeyError):
+            self.test_event_1["certego"]["routing_history"]
         self.routing.match(self.test_event_1)
         self.assertTrue(self.test_event_1["certego"]["routing_history"]["Workshop"])
-        # Check if the rule isn't processed twice
+        # Check if the rule is processed twice
         self.routing.match(self.test_event_1)
-        # New rule has to be parsed
+        for key in self.test_event_1["certego"]["routing_history"]:
+            if key == "Workshop":
+                wokshop_entries = wokshop_entries + 1
+            elif key == "TyreFit":
+                tyrefit_entries = tyrefit_entries + 1
+        self.assertEqual(wokshop_entries, 1)
+        self.assertEqual(tyrefit_entries, 0)
+        wokshop_entries = 0
+        tyrefit_entries = 0
+        # Just the second rule has to be parsed
         self.routing.load_from_dicts([load_test_data("test_rule_24_routing_history")])
         self.routing.match(self.test_event_1)
-        print(self.test_event_1)
         self.assertTrue(self.test_event_1["certego"]["routing_history"]["TyreFit"])
         for key in self.test_event_1["certego"]["routing_history"]:
             if key == "Workshop":

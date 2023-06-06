@@ -7,24 +7,6 @@
               {
                 "type": "EQUALS",
                 "key": "wheel_model",
-                "description": "Carbon fiber wheels needs manual truing",
-                "value": [
-                  "Superlight",
-                  "RacePro"
-                ]
-              }
-            ],
-            "streams": {
-              "Workshop": {
-                "workers_needed": 1
-              }
-            }
-          },
-          {
-            "filters": [
-              {
-                "type": "EQUALS",
-                "key": "wheel_model",
                 "value": [
                   "Superlight",
                   "RacePro"
