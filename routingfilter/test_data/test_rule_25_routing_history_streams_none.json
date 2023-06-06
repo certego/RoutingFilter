@@ -15,26 +15,6 @@
               }
             ],
             "streams": {
-              "Workshop": {
-                "workers_needed": 1
-              }
-            }
-          },
-          {
-            "filters": [
-              {
-                "type": "EQUALS",
-                "key": "wheel_model",
-                "value": [
-                  "Superlight",
-                  "RacePro"
-                ]
-              }
-            ],
-            "streams": {
-              "TyreFit": {
-                "workers_needed": 1
-              }
             }
           }
         ]

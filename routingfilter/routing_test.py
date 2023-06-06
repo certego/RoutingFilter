@@ -17,29 +17,28 @@ class RoutingTestCase(unittest.TestCase):
     """Class to tests routing.py file. These tests loads sample events from JSON files in 'test_data' folder
     and test if the routing rules are working correctly."""
 
-    # Load frequently accessed test data from JSON files
-    test_event_1 = load_test_data("test_event_1")
-    test_event_2 = load_test_data("test_event_2")
-    test_event_3 = load_test_data("test_event_3")
-    test_event_4 = load_test_data("test_event_4")
-    test_event_5 = load_test_data("test_event_5")
-    test_event_6 = load_test_data("test_event_6")
-    test_event_7 = load_test_data("test_event_7")
-    test_event_8 = load_test_data("test_event_8")
-    test_event_9 = load_test_data("test_event_9")
-    test_event_10 = load_test_data("test_event_10")
-    test_event_11 = load_test_data("test_event_11")
-    test_event_12 = load_test_data("test_event_12")
-    test_event_13 = load_test_data("test_event_13")
-    test_event_14 = load_test_data("test_event_14")
-    test_event_15 = load_test_data("test_event_15")
-    test_event_16 = load_test_data("test_event_16")
-    test_event_17 = load_test_data("test_event_17")
-    test_event_with_list_1 = load_test_data("test_event_with_list_1")
-    test_event_with_list_2 = load_test_data("test_event_with_list_2")
-
     def setUp(self):
         self.routing = Routing()
+        # Load frequently accessed test data from JSON files
+        self.test_event_1 = load_test_data("test_event_1")
+        self.test_event_2 = load_test_data("test_event_2")
+        self.test_event_3 = load_test_data("test_event_3")
+        self.test_event_4 = load_test_data("test_event_4")
+        self.test_event_5 = load_test_data("test_event_5")
+        self.test_event_6 = load_test_data("test_event_6")
+        self.test_event_7 = load_test_data("test_event_7")
+        self.test_event_8 = load_test_data("test_event_8")
+        self.test_event_9 = load_test_data("test_event_9")
+        self.test_event_10 = load_test_data("test_event_10")
+        self.test_event_11 = load_test_data("test_event_11")
+        self.test_event_12 = load_test_data("test_event_12")
+        self.test_event_13 = load_test_data("test_event_13")
+        self.test_event_14 = load_test_data("test_event_14")
+        self.test_event_15 = load_test_data("test_event_15")
+        self.test_event_16 = load_test_data("test_event_16")
+        self.test_event_17 = load_test_data("test_event_17")
+        self.test_event_with_list_1 = load_test_data("test_event_with_list_1")
+        self.test_event_with_list_2 = load_test_data("test_event_with_list_2")
 
     def test_wrong_inputs(self):
         self.assertIsNone(self.routing.get_rules())
@@ -74,33 +73,36 @@ class RoutingTestCase(unittest.TestCase):
         self.assertDictEqual(self.routing.match(self.test_event_1)[0]["output"], {'Workshop': {'workers_needed': 1}})
 
     def test_routing_history(self):
-        wokshop_entries = 0
-        tyrefit_entries = 0
-        self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
+        self.routing.load_from_dicts([load_test_data("test_rule_24_routing_history")])
         self.routing.match(self.test_event_1)
         self.assertTrue(self.test_event_1["certego"]["routing_history"]["Workshop"])
         # Check if the rule is processed twice
-        self.routing.match(self.test_event_1)
-        for key in self.test_event_1["certego"]["routing_history"]:
-            if key == "Workshop":
-                wokshop_entries = wokshop_entries + 1
-            elif key == "TyreFit":
-                tyrefit_entries = tyrefit_entries + 1
-        self.assertEqual(wokshop_entries, 1)
-        self.assertEqual(tyrefit_entries, 0)
-        wokshop_entries = 0
-        tyrefit_entries = 0
+        self.assertTrue("Workshop" in self.test_event_1["certego"]["routing_history"])
+        self.assertFalse("TyreFit" in self.test_event_1["certego"]["routing_history"])
         # Just the second rule has to be parsed
-        self.routing.load_from_dicts([load_test_data("test_rule_24_routing_history")])
         self.routing.match(self.test_event_1)
-        self.assertTrue(self.test_event_1["certego"]["routing_history"]["TyreFit"])
-        for key in self.test_event_1["certego"]["routing_history"]:
-            if key == "Workshop":
-                wokshop_entries = wokshop_entries + 1
-            elif key == "TyreFit":
-                tyrefit_entries = tyrefit_entries + 1
-        self.assertEqual(wokshop_entries, 1)
-        self.assertEqual(tyrefit_entries, 1)
+        self.assertTrue("Workshop" in self.test_event_1["certego"]["routing_history"])
+        self.assertTrue("TyreFit" in self.test_event_1["certego"]["routing_history"])
+        
+    def test_routing_history_stream_none(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
+        self.routing.match(self.test_event_1)
+        self.assertTrue(self.test_event_1["certego"]["routing_history"]["Workshop"])
+        self.routing.load_from_dicts([load_test_data("test_rule_25_routing_history_streams_none")])
+        self.routing.match(self.test_event_1)
+        self.assertEqual(len(self.test_event_1["certego"]["routing_history"].keys()), 1)
+
+    def test_routing_history_same_rule_twice(self):
+            workshop_count = 0
+            self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
+            self.routing.match(self.test_event_1)
+            self.assertTrue(self.test_event_1["certego"]["routing_history"]["Workshop"])
+            self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
+            self.routing.match(self.test_event_1)
+            for key in self.test_event_1["certego"]["routing_history"].keys():
+                if key == "Workshop":
+                    workshop_count = workshop_count + 1
+            self.assertEqual(workshop_count, 1)
 
     def test_rule_1(self):
         # Test rule loading and applying with full output
@@ -141,6 +143,11 @@ class RoutingTestCase(unittest.TestCase):
         self.assertDictEqual(self.routing.match(self.test_event_1)[0], load_test_data("test_event_1_rule_1_response"))
         self.assertDictEqual(self.routing.match(self.test_event_2)[0], load_test_data("test_event_1_rule_1_response"))
         self.assertEqual(self.routing.match(self.test_event_3), [])
+        
+
+    def test_special_tag_all2(self):
+        test_rule_1_equals = load_test_data("test_rule_1_equals")
+        test_rule_2_all_equals = load_test_data("test_rule_2_all_equals")
         test_rule_2_all_equals["streams"]["rules"]["all"][0]["filters"][0]["key"] = "wheel_model_wrong"
         self.routing.load_from_dicts([test_rule_1_equals, test_rule_2_all_equals])
         self.assertDictEqual(self.routing.match(self.test_event_1)[0], load_test_data("test_event_1_rule_1_response"))
@@ -164,31 +171,44 @@ class RoutingTestCase(unittest.TestCase):
         self.routing.load_from_dicts([test_rule_7])
         self.assertEqual(self.routing.match(self.test_event_7), [])
 
-    def test_single_filters(self):
-        # Test all filter types defined in ConfigFilter
+    def test_single_filters_ALL(self):
         self.routing.load_from_dicts([load_test_data("test_rule_0_all")])  # ALL
         self.assertTrue(self.routing.match(self.test_event_1))
         self.assertFalse(self.routing.match(self.test_event_2))
         self.assertTrue(self.routing.match(self.test_event_3))
         self.assertFalse(self.routing.match(self.test_event_4))
+
+    def test_single_filters_EQUALS(self):
         self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])  # EQUALS
         self.assertTrue(self.routing.match(self.test_event_1))
         self.assertFalse(self.routing.match(self.test_event_3))
+    
+    def test_single_filters_NOT_EQUALS(self):
         self.routing.load_from_dicts([load_test_data("test_rule_1_not_equals")])  # NOT EQUALS
         self.assertFalse(self.routing.match(self.test_event_1))
         self.assertTrue(self.routing.match(self.test_event_3))
+
+    def test_single_filters_STARTSWITH(self):
         self.routing.load_from_dicts([load_test_data("test_rule_6_startswith")])  # STARTSWITH
         self.assertTrue(self.routing.match(self.test_event_1))
         self.assertFalse(self.routing.match(self.test_event_3))
+
+    def test_single_filters_KEYWORD(self):
         self.routing.load_from_dicts([load_test_data("test_rule_7_keyword")])  # KEYWORD
         self.assertTrue(self.routing.match(self.test_event_1))
         self.assertFalse(self.routing.match(self.test_event_3))
+
+    def test_single_filters_REGEXP(self):
         self.routing.load_from_dicts([load_test_data("test_rule_8_regexp")])  # REGEXP
         self.assertTrue(self.routing.match(self.test_event_1))
         self.assertFalse(self.routing.match(self.test_event_3))
+
+    def test_single_filters_DOMAIN(self):
         self.routing.load_from_dicts([load_test_data("test_rule_11_domain")])  # DOMAIN
         self.assertTrue(self.routing.match(self.test_event_4))
         self.assertFalse(self.routing.match(self.test_event_5))
+
+    def test_single_filters_GREATER(self):
         self.routing.load_from_dicts([load_test_data("test_rule_12_greater")])  # GREATER
         self.assertFalse(self.routing.match({}))
         self.assertTrue(self.routing.match(self.test_event_1))
@@ -198,29 +218,37 @@ class RoutingTestCase(unittest.TestCase):
             event_2["tags"] = "mountain_bike"
             event_2["price"] = "600a"
             self.routing.match(event_2)
+        
+    def test_single_filters_LESS(self):
         self.routing.load_from_dicts([load_test_data("test_rule_13_less")])  # LESS
         self.assertFalse(self.routing.match(self.test_event_1))
         self.assertTrue(self.routing.match(self.test_event_3))
+
+    def test_single_filters_ENDSSWITH(self):
         self.routing.load_from_dicts([load_test_data("test_rule_14_endswith")])  # ENDSSWITH
         self.assertTrue(self.routing.match(self.test_event_1))
         self.assertFalse(self.routing.match(self.test_event_3))
         self.assertFalse(self.routing.match(self.test_event_8))
 
-    def test_single_filter_EXIST_NOT_EXISTS(self):
+    def test_single_filter_EXIST(self):
         self.routing.load_from_dicts([load_test_data("test_rule_5_exists")])  # EXISTS
         self.assertTrue(self.routing.match(self.test_event_1))
         self.assertFalse(self.routing.match(self.test_event_3))
         self.assertTrue(self.routing.match(self.test_event_10))
+    
+    def test_single_filter_NOT_EXISTS(self):
         self.routing.load_from_dicts([load_test_data("test_rule_6_not_exists")])  # NOT_EXISTS
         self.assertFalse(self.routing.match(self.test_event_1))
         self.assertTrue(self.routing.match(self.test_event_3))
         self.assertFalse(self.routing.match(self.test_event_10))
 
-    def test_single_filter_NETWORK_NOT_NETWORK(self):
+    def test_single_filter_NETWORK(self):
         self.routing.load_from_dicts([load_test_data("test_rule_9_network")])  # NETWORK
         self.assertTrue(self.routing.match(self.test_event_4))
         self.assertFalse(self.routing.match(self.test_event_9))
         self.assertFalse(self.routing.match(self.test_event_6))  # Unparsable
+
+    def test_single_filter_NOT_NETWORK(self):
         self.routing.load_from_dicts([load_test_data("test_rule_10_not_network")])  # NOT_NETWORK
         self.assertFalse(self.routing.match(self.test_event_4))
         self.assertTrue(self.routing.match(self.test_event_5))
@@ -235,34 +263,48 @@ class RoutingTestCase(unittest.TestCase):
         self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
         self.assertTrue(self.routing.match(self.test_event_with_list_2))
 
-    def test_single_filter_TYPEOF(self):
+    def test_single_filter_TYPEOF_exception(self):
         # if self.value is a list, it returns True if almost one type is correct
         self.routing.load_from_dicts([load_test_data("test_rule_15_typeof_exception")]) # "value": ["str", "int", "dict"]
         self.assertTrue(self.routing.match(self.test_event_8))      # value: "str"
         self.assertTrue(self.routing.match(self.test_event_11))     # value: "int"
         self.assertTrue(self.routing.match(self.test_event_13))     # value: "dict"
         self.assertFalse(self.routing.match(self.test_event_12))
+
+    def test_single_filter_TYPEOF_str(self):
         self.routing.load_from_dicts([load_test_data("test_rule_16_typeof_str")])   # is_str
         self.assertTrue(self.routing.match(self.test_event_8))
         self.assertFalse(self.routing.match(self.test_event_10))    # is_not_str
+
+    def test_single_filter_TYPEOF_int(self):
         self.routing.load_from_dicts([load_test_data("test_rule_17_typeof_int")])   # is_int
         self.assertTrue(self.routing.match(self.test_event_11))
         self.assertFalse(self.routing.match(self.test_event_8))     # is_not_int
+
+    def test_single_filter_TYPEOF_bool(self):
         self.routing.load_from_dicts([load_test_data("test_rule_18_typeof_bool")])   # is_bool
         self.assertTrue(self.routing.match(self.test_event_12))
         self.assertFalse(self.routing.match(self.test_event_8))     # is_not_bool
+    
+    def test_single_filter_TYPEOF_list(self):
         self.routing.load_from_dicts([load_test_data("test_rule_19_typeof_list")])  # is_list
         self.assertTrue(self.routing.match(self.test_event_10))
         self.assertFalse(self.routing.match(self.test_event_8))    # is_not_list
+
+    def test_single_filter_TYPEOF_dict(self):
         self.routing.load_from_dicts([load_test_data("test_rule_20_typeof_dict")])  # is_dict
         self.assertTrue(self.routing.match(self.test_event_13))
         self.assertFalse(self.routing.match(self.test_event_11))    # is_not_dict
+
+    def test_single_filter_TYPEOF_ip_address(self):
         self.routing.load_from_dicts([load_test_data("test_rule_21_typeof_ip")])  # is_ipv4
         self.assertTrue(self.routing.match(self.test_event_15))
         self.assertTrue(self.routing.match(self.test_event_16))     # is_ipv6
         self.assertFalse(self.routing.match(self.test_event_11))    # insert an integer
         self.assertFalse(self.routing.match(self.test_event_14))    # insert a string with a number: ex. "8"
         self.assertFalse(self.routing.match(self.test_event_12))    # is_not_ip
+
+    def test_single_filter_TYPEOF_mac_address(self):
         self.routing.load_from_dicts([load_test_data("test_rule_22_typeof_mac")])    # is_mac
         self.assertTrue(self.routing.match(self.test_event_17))
         self.assertFalse(self.routing.match(self.test_event_16))    # is_not_mac
@@ -274,3 +316,27 @@ class RoutingTestCase(unittest.TestCase):
         self.assertFalse(self.routing.match(self.test_event_4))
         self.routing.load_from_dicts([load_test_data("test_rule_23_network_variables")], variables={"$INTERNAL_IPS": "192.168.0.0/16"})
         self.assertTrue(self.routing.match(self.test_event_4))
+
+    def test_rule_in_routing_history(self):
+        event = {"certego": {"routing_history": {}}}
+        rule = {
+            "filters": [
+              {
+                "type": "EQUALS",
+                "key": "wheel_model",
+                "description": "Carbon fiber wheels needs manual truing",
+                "value": [
+                  "Superlight",
+                  "RacePro"
+                ]
+              }
+            ],
+            "streams": {
+              "Workshop": {
+                "workers_needed": 1
+              }
+            }
+          }
+        # regola con streams None e torna false
+        # regola con True
+        self.assertFalse(self.routing.rule_in_routing_history(event, rule))
