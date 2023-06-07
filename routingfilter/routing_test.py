@@ -335,7 +335,7 @@ class RoutingTestCase(unittest.TestCase):
             }
           }
         self.assertFalse(self.routing.rule_in_routing_history(event, rule))
-        event = {"certego": {"routing_history": {"WorkShop": "2023-06-06T18:00:00.000Z"}}}
+        event = {"certego": {"routing_history": {"Workshop": "2023-06-06T18:00:00.000Z"}}}
         self.assertFalse(self.routing.rule_in_routing_history(event, rule))
         rule = {
             "filters": [
