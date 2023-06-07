@@ -1,3 +1,8 @@
+## 1.5.x
+### 1.5.0
+#### Features
+* Added routing history and loop protection in rule parsing
+
 ## 1.4.x
 ### 1.4.1
 #### Bugfix

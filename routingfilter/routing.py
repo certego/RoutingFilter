@@ -1,4 +1,5 @@
 import copy
+from datetime import datetime
 import json
 import logging
 
@@ -35,6 +36,8 @@ class Routing:
         :return: A list of dicts containing the matched rules and the outputs in the following format: {"rules": [...], "output": {...}}; an empty list if no rule matched
         :rtype: List[dict]
         """
+        if not event.get("certego", {}).get("routing_history", {}):
+            event["certego"] = {"routing_history": {}}
         if not self.rules:
             self.logger.error("'rules_list' must be set before evaluating a match!")
             raise ValueError("'rules_list' must be set before evaluating a match!")
@@ -61,7 +64,7 @@ class Routing:
             for rule in rules:
                 # check if ALL the filters are matching
                 filters = [ConfigFilter(f) for f in rule.get("filters", [])]
-                if all(f.is_matching(event) for f in filters):
+                if all(f.is_matching(event) for f in filters) and not self.rule_in_routing_history(event, rule):
                     matching_rules.append(rule)
                     break
         if not matching_rules:
@@ -69,9 +72,9 @@ class Routing:
                 for rule in self.rules[type_]["rules"].get(tag_field_name, []):
                     # check if ALL the filters are matching
                     config_filters = [ConfigFilter(f) for f in rule.get("filters", [])]
-                    if config_filters and all(f.is_matching(event) for f in config_filters):
+                    if config_filters and all(f.is_matching(event) for f in config_filters) and not self.rule_in_routing_history(event, rule):
                         matching_rules.append(rule)
-                        break  # the first matching rule wins
+                        break  # the first matching rule wins if it doesn't exist in the output field
         # Rename "filters" to "rules" and "type" to "output" to be more generic
         matching_rules = copy.deepcopy(matching_rules)
         for mr in matching_rules:
@@ -79,6 +82,8 @@ class Routing:
                 mr["rules"] = mr.pop("filters")
             if type_ in mr:
                 mr["output"] = mr.pop(type_)
+                if len(mr["output"]) > 0:
+                    event["certego"]["routing_history"][list(mr["output"].keys())[0]] = datetime.now().isoformat()
         return matching_rules
 
     def load_from_dicts(self, rules_list: List[dict], validate_rules: bool = True, variables: Optional[dict] = None) -> None:
@@ -172,3 +177,18 @@ class Routing:
                     for filter_ in filter_output["filters"]:
                         config_filter_obj = ConfigFilter(filter_)
                         config_filter_obj.is_matching({})
+
+    def rule_in_routing_history(self, event, rule):
+        """Checking if the given rule has already been processed
+
+        :param event: The entire event to process
+        :type event: dict
+        :param rule: The rule to check
+        :type rule: dict
+        """
+        if rule["streams"] is None:
+            return False
+        for key in rule["streams"].keys():
+            if key in event["certego"]["routing_history"]:
+                return True
+        return False
