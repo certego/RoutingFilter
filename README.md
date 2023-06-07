@@ -12,5 +12,12 @@ routing.match(test_event_1)
 ```
 See the [online documentation](https://routingfilter.readthedocs.io/en/latest/) for further details.
  
+### Release steps
+* (If needed) Update the requirements in `requirements.txt` and `setup.py`
+* Add a new entry in `CHANGELOG.md` with the new version number
+* Update the version number in `setup.py`
+* Commit and merge the changes into `master` branch
+* Publish a new release with the version number as a tag: the CI will automatically publish the new version un PyPI
+
 ### License
 This project is licensed under the **GNU LGPLv3** license.
