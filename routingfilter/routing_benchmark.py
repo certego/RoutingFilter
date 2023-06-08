@@ -50,12 +50,11 @@ class RoutingBenchMark():
     def test3_EQUALS_list_values(self):
         self.routing = Routing()
         my_dict = load_test_data("benchmark_rule_dict")
+        for i in range(MAX_LIST_VALUES):
+            my_dict["filters"][0]["value"].append("test-" + str(i))
         rule = load_test_data("benchmark_rule_1_equals")
         for i in range(MAX_RULE):
             rule["streams"]["rules"]["mountain_bike"].append(my_dict)
-        for i in rule["streams"]["rules"]["mountain_bike"]:
-            for j in range(MAX_LIST_VALUES):
-                i["filters"][0]["value"].append("test-" + str(j))
         self.benchmark_event_1_equal = load_test_data("benchmark_event_1_equal")
         self.benchmark_event_1_equal.update({"wheel_model": "test"})
         self.routing.load_from_dicts([rule])
