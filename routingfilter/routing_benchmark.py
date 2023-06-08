@@ -25,7 +25,7 @@ class RoutingBenchMark():
         """
         self.routing = Routing()
         my_dict = load_test_data("benchmark_rule_equals_dict")
-        # Create 100 EQUALS same rules 
+        # Create 100 EQUALS same rules
         rule = load_test_data("benchmark_rule_equals")
         for i in range(MAX_RULE):
             rule["streams"]["rules"]["mountain_bike"].append(my_dict)
@@ -204,6 +204,99 @@ class RoutingBenchMark():
         end_time = datetime.now()
         print(f"{self.test4_STARTSWITH_list_values_exists.__name__}: {(end_time - start_time).total_seconds()}")
 
+    def test1_ENDSWITH_no_key_match(self):
+        """Performance test, for the ENDSWITH routing filter type, with:
+            - 100 same rules (type: ENDSWITH)
+            - 100 messages with 50 fields different from 'wheel_model'
+        """
+        self.routing = Routing()
+        my_dict = load_test_data("benchmark_rule_endswith_dict")
+        # Create 100 EQUALS same rules 
+        rule = load_test_data("benchmark_rule_endswith")
+        for i in range(MAX_RULE):
+            rule["streams"]["rules"]["mountain_bike"].append(my_dict)
+        self.benchmark_event_1 = load_test_data("benchmark_event_1")
+        self.routing.load_from_dicts([rule])
+        start_time = datetime.now()
+        # Sending 100 messages to the routing
+        for i in range(MAX_EVENT):
+            self.routing.match(self.benchmark_event_1)
+        end_time = datetime.now()
+        print(f"{self.test1_ENDSWITH_no_key_match.__name__}: {(end_time - start_time).total_seconds()}")
+
+    def test2_ENDSWITH_key_exists(self):
+        """Performance test, for the ENDSWITH routing filter type, with:
+            - 100 same rules (type: ENDSWITH)
+            - 100 messages with 50 fields (one of them 'wheel_model' but not 'Superlight'
+        """
+        self.routing = Routing()
+        my_dict = load_test_data("benchmark_rule_endswith_dict")
+        # Create 100 EQUALS same rules
+        rule = load_test_data("benchmark_rule_endswith")
+        for i in range(MAX_RULE):
+            rule["streams"]["rules"]["mountain_bike"].append(my_dict)
+        self.benchmark_event_1 = load_test_data("benchmark_event_1")
+        # Adding the field 'wheel_model' but with a value different from 'Superlight'
+        self.benchmark_event_1.update({"wheel_model": "test"})
+        self.routing.load_from_dicts([rule])
+        start_time = datetime.now()
+        # Sending 100 messages to the routing
+        for i in range(MAX_EVENT):
+            self.routing.match(self.benchmark_event_1)
+        end_time = datetime.now()
+        print(f"{self.test2_ENDSWITH_key_exists.__name__}: {(end_time - start_time).total_seconds()}")
+
+    def test3_ENDSWITH_list_values(self):
+        """Performance test, for the ENDSWITH routing filter type, with:
+            - 100 same rules (type: ENDSWITH)
+            - 100 messages with 50 fields (one of them 'wheel_model' but not 'Superlight'
+            - 100 different values in the rules (no matches with the message field)
+        """
+        self.routing = Routing()
+        my_dict = load_test_data("benchmark_rule_endswith_dict")
+        # Create a list of 100 values in the "value" field of the rule
+        for i in range(MAX_LIST_VALUES):
+            my_dict["filters"][0]["value"].append("test-" + str(i))
+        rule = load_test_data("benchmark_rule_endswith")
+        # Create 100 EQUALS same rules with 100 values
+        for i in range(MAX_RULE):
+            rule["streams"]["rules"]["mountain_bike"].append(my_dict)
+        self.benchmark_event_1 = load_test_data("benchmark_event_1")
+        self.benchmark_event_1.update({"wheel_model": "test"})
+        self.routing.load_from_dicts([rule])
+        start_time = datetime.now()
+        # Sending 100 messages to the routing
+        for i in range(MAX_EVENT):
+            self.routing.match(self.benchmark_event_1)
+        end_time = datetime.now()
+        print(f"{self.test3_ENDSWITH_list_values.__name__}: {(end_time - start_time).total_seconds()}")
+
+    def test4_ENDSWITH_list_values_exists(self):
+        """Performance test, for the ENDSWITH routing filter type, with:
+            - 100 values in the "wheel_model" of the rule and of the message, but none of them triggers a match (no 'Superlight')
+        """
+        self.routing = Routing()
+        my_dict = load_test_data("benchmark_rule_endswith_dict")
+        # Create a list of 100 values in the "value" field of the rule
+        for i in range(MAX_LIST_VALUES):
+            my_dict["filters"][0]["value"].append("test-" + str(i))
+        rule = load_test_data("benchmark_rule_endswith")
+        # Create 100 EQUALS same rules with 100 values
+        for i in range(MAX_RULE):
+            rule["streams"]["rules"]["mountain_bike"].append(my_dict)
+        self.routing.load_from_dicts([rule])
+        # Create a list of values in the message for "wheel_model"
+        self.benchmark_event_1 = load_test_data("benchmark_event_1")
+        self.benchmark_event_1.update({"wheel_model": []})
+        for i in range(MAX_LIST_VALUES):
+            self.benchmark_event_1["wheel_model"].append("test-" + str(i))
+        start_time = datetime.now()
+        # Sending 100 messages to the routing
+        for i in range(MAX_EVENT):
+            self.routing.match(self.benchmark_event_1)
+        end_time = datetime.now()
+        print(f"{self.test4_ENDSWITH_list_values_exists.__name__}: {(end_time - start_time).total_seconds()}")
+
 def main():
     routing_benchmark = RoutingBenchMark()
     routing_benchmark.test1_EQUALS_no_key_match()
@@ -214,6 +307,10 @@ def main():
     routing_benchmark.test2_STARTSWITH_key_exists()
     routing_benchmark.test3_STARTSWITH_list_values()
     routing_benchmark.test4_STARTSWITH_list_values_exists()
+    routing_benchmark.test1_ENDSWITH_no_key_match()
+    routing_benchmark.test2_ENDSWITH_key_exists()
+    routing_benchmark.test3_ENDSWITH_list_values()
+    routing_benchmark.test4_ENDSWITH_list_values_exists()
 
 if __name__ == "__main__":
     main()
