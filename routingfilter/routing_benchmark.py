@@ -4,6 +4,7 @@ import os
 from typing import List
 
 from routingfilter.routing import Routing
+# from routing import Routing
 
 def load_test_data(name):
     """Load a JSON test file from 'test_data' folder, given its name (extension excluded), and parse it into a dictionary."""
@@ -576,32 +577,129 @@ class RoutingBenchMark():
         end_time = datetime.now()
         print(f"{self.test4_NETWORK_list_values_exists.__name__}: {(end_time - start_time).total_seconds()}")
 
+    def test1_DOMAIN_no_key_match(self):
+        """Performance test, for the DOMAIN routing filter type, with:
+            - 100 same rules (type: DOMAIN)
+            - 100 messages with 50 fields different from 'wheel_model'
+        """
+        routing = Routing()
+        my_dict = load_test_data("benchmark_rule_domain_dict")
+        # Create 100 EQUALS same rules 
+        rule = load_test_data("benchmark_rule_domain")
+        for i in range(MAX_RULE):
+            rule["streams"]["rules"]["mountain_bike"].append(my_dict)
+        benchmark_event_1 = load_test_data("benchmark_event_1")
+        routing.load_from_dicts([rule])
+        start_time = datetime.now()
+        # Sending 100 messages to the routing
+        for i in range(MAX_EVENT):
+            routing.match(benchmark_event_1)
+        end_time = datetime.now()
+        print(f"{self.test1_DOMAIN_no_key_match.__name__}: {(end_time - start_time).total_seconds()}")
+
+    def test2_DOMAIN_key_exists(self):
+        """Performance test, for the DOMAIN routing filter type, with:
+            - 100 same rules (type: DOMAIN)
+            - 100 messages with 50 fields (one of them 'wheel_model' but not 'Superlight'
+        """
+        routing = Routing()
+        my_dict = load_test_data("benchmark_rule_domain_dict")
+        # Create 100 EQUALS same rules
+        rule = load_test_data("benchmark_rule_domain")
+        for i in range(MAX_RULE):
+            rule["streams"]["rules"]["mountain_bike"].append(my_dict)
+        benchmark_event_1 = load_test_data("benchmark_event_1")
+        # Adding the field 'wheel_model' but with a value different from the network 10.10.10.0/24
+        benchmark_event_1.update({"wheel_model": "192.168.1.0/24"})
+        routing.load_from_dicts([rule])
+        start_time = datetime.now()
+        # Sending 100 messages to the routing
+        for i in range(MAX_EVENT):
+            routing.match(benchmark_event_1)
+        end_time = datetime.now()
+        print(f"{self.test2_DOMAIN_key_exists.__name__}: {(end_time - start_time).total_seconds()}")
+
+    def test3_DOMAIN_list_values(self):
+        """Performance test, for the DOMAIN routing filter type, with:
+            - 100 same rules (type: DOMAIN)
+            - 100 messages with 50 fields (one of them 'wheel_model' but not in the google.com domain
+            - 100 different values in the rules (no matches with the message field)
+        """
+        routing = Routing()
+        my_dict = load_test_data("benchmark_rule_domain_dict")
+        # Create a list of 100 values in the "value" field of the rule
+        for i in range(MAX_LIST_VALUES):
+            my_dict["filters"][0]["value"].append("test-" + str(i))
+        rule = load_test_data("benchmark_rule_domain")
+        # Create 100 EQUALS same rules with 100 values
+        for i in range(MAX_RULE):
+            rule["streams"]["rules"]["mountain_bike"].append(my_dict)
+        benchmark_event_1 = load_test_data("benchmark_event_1")
+        benchmark_event_1.update({"wheel_model": "microsoft.com"})
+        routing.load_from_dicts([rule])
+        start_time = datetime.now()
+        # Sending 100 messages to the routing
+        for i in range(MAX_EVENT):
+            routing.match(benchmark_event_1)
+        end_time = datetime.now()
+        print(f"{self.test3_DOMAIN_list_values.__name__}: {(end_time - start_time).total_seconds()}")
+
+    def test4_DOMAIN_list_values_exists(self):
+        """Performance test, for the DOMAIN routing filter type, with:
+            - 100 values in the "wheel_model" of the rule and of the message, but none of them triggers a match (no domain google.com)
+        """
+        routing = Routing()
+        my_dict = load_test_data("benchmark_rule_domain_dict")
+        # Create a list of 100 values in the "value" field of the rule
+        for i in range(MAX_LIST_VALUES):
+            my_dict["filters"][0]["value"].append("test-" + str(i))
+        rule = load_test_data("benchmark_rule_domain")
+        # Create 100 EQUALS same rules with 100 values
+        for i in range(MAX_RULE):
+            rule["streams"]["rules"]["mountain_bike"].append(my_dict)
+        routing.load_from_dicts([rule])
+        # Create a list of values in the message for "wheel_model"
+        benchmark_event_1 = load_test_data("benchmark_event_1")
+        benchmark_event_1.update({"wheel_model": []})
+        for i in range(MAX_LIST_VALUES):
+            benchmark_event_1["wheel_model"].append("test-" + str(i))
+        start_time = datetime.now()
+        # Sending 100 messages to the routing
+        for i in range(MAX_EVENT):
+            routing.match(benchmark_event_1)
+        end_time = datetime.now()
+        print(f"{self.test4_DOMAIN_list_values_exists.__name__}: {(end_time - start_time).total_seconds()}")
+
 def main():
     routing_benchmark = RoutingBenchMark()
-    routing_benchmark.test1_EQUALS_no_key_match()
-    routing_benchmark.test2_EQUALS_key_exists()
-    routing_benchmark.test3_EQUALS_list_values()
-    routing_benchmark.test4_EQUALS_list_values_message()
-    routing_benchmark.test1_STARTSWITH_no_key_match()
-    routing_benchmark.test2_STARTSWITH_key_exists()
-    routing_benchmark.test3_STARTSWITH_list_values()
-    routing_benchmark.test4_STARTSWITH_list_values_exists()
-    routing_benchmark.test1_ENDSWITH_no_key_match()
-    routing_benchmark.test2_ENDSWITH_key_exists()
-    routing_benchmark.test3_ENDSWITH_list_values()
-    routing_benchmark.test4_ENDSWITH_list_values_exists()
-    routing_benchmark.test1_KEYWORD_no_key_match()
-    routing_benchmark.test2_KEYWORD_key_exists()
-    routing_benchmark.test3_KEYWORD_list_values()
-    routing_benchmark.test4_KEYWORD_list_values_exists()
-    routing_benchmark.test1_REGEXP_no_key_match()
-    routing_benchmark.test2_REGEXP_key_exists()
-    routing_benchmark.test3_REGEXP_list_values()
-    routing_benchmark.test4_REGEXP_list_values_exists()
-    routing_benchmark.test1_NETWORK_no_key_match()
-    routing_benchmark.test2_NETWORK_key_exists()
-    routing_benchmark.test3_NETWORK_list_values()
-    routing_benchmark.test4_NETWORK_list_values_exists()
+    # routing_benchmark.test1_EQUALS_no_key_match()
+    # routing_benchmark.test2_EQUALS_key_exists()
+    # routing_benchmark.test3_EQUALS_list_values()
+    # routing_benchmark.test4_EQUALS_list_values_message()
+    # routing_benchmark.test1_STARTSWITH_no_key_match()
+    # routing_benchmark.test2_STARTSWITH_key_exists()
+    # routing_benchmark.test3_STARTSWITH_list_values()
+    # routing_benchmark.test4_STARTSWITH_list_values_exists()
+    # routing_benchmark.test1_ENDSWITH_no_key_match()
+    # routing_benchmark.test2_ENDSWITH_key_exists()
+    # routing_benchmark.test3_ENDSWITH_list_values()
+    # routing_benchmark.test4_ENDSWITH_list_values_exists()
+    # routing_benchmark.test1_KEYWORD_no_key_match()
+    # routing_benchmark.test2_KEYWORD_key_exists()
+    # routing_benchmark.test3_KEYWORD_list_values()
+    # routing_benchmark.test4_KEYWORD_list_values_exists()
+    # routing_benchmark.test1_REGEXP_no_key_match()
+    # routing_benchmark.test2_REGEXP_key_exists()
+    # routing_benchmark.test3_REGEXP_list_values()
+    # routing_benchmark.test4_REGEXP_list_values_exists()
+    # routing_benchmark.test1_NETWORK_no_key_match()
+    # routing_benchmark.test2_NETWORK_key_exists()
+    # routing_benchmark.test3_NETWORK_list_values()
+    # routing_benchmark.test4_NETWORK_list_values_exists()
+    routing_benchmark.test1_DOMAIN_no_key_match()
+    routing_benchmark.test2_DOMAIN_key_exists()
+    routing_benchmark.test3_DOMAIN_list_values()
+    routing_benchmark.test4_DOMAIN_list_values_exists()
 
 if __name__ == "__main__":
     main()
