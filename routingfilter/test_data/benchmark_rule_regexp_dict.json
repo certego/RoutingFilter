@@ -1,0 +1,17 @@
+{
+    "filters": [
+      {
+        "type": "REGEXP",
+        "key": "wheel_model",
+        "description": "Carbon fiber wheels needs manual truing",
+        "value": [
+          "(.*?)<abc>[a-zA-Z]{4}AAAAAAAA"
+        ]
+      }
+    ],
+    "streams": {
+      "Workshop": {
+        "workers_needed": 1
+      }
+    }
+  }

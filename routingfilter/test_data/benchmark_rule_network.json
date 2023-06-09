@@ -1,0 +1,25 @@
+{
+    "streams": {
+      "rules": {
+        "mountain_bike": [
+          {
+            "filters": [
+              {
+                "type": "NETWORK",
+                "key": "wheel_model",
+                "description": "Carbon fiber wheels needs manual truing",
+                "value": [
+                  "10.10.10.0/24"
+                ]
+              }
+            ],
+            "streams": {
+              "Workshop": {
+                "workers_needed": 1
+              }
+            }
+          }
+        ]
+      }
+    }
+  }

@@ -1,0 +1,17 @@
+{
+    "filters": [
+      {
+        "type": "GREATER",
+        "key": "wheel_model",
+        "description": "Carbon fiber wheels needs manual truing",
+        "value": [
+          1
+        ]
+      }
+    ],
+    "streams": {
+      "Workshop": {
+        "workers_needed": 1
+      }
+    }
+  }

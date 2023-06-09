@@ -1,0 +1,25 @@
+{
+    "streams": {
+      "rules": {
+        "mountain_bike": [
+          {
+            "filters": [
+              {
+                "type": "ENDSWITH",
+                "key": "wheel_model",
+                "description": "Carbon fiber wheels needs manual truing",
+                "value": [
+                  "Superlight"
+                ]
+              }
+            ],
+            "streams": {
+              "Workshop": {
+                "workers_needed": 1
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
