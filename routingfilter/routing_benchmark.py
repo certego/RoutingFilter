@@ -4,7 +4,6 @@ import os
 from typing import List
 
 from routingfilter.routing import Routing
-# from routing import Routing
 
 def load_test_data(name):
     """Load a JSON test file from 'test_data' folder, given its name (extension excluded), and parse it into a dictionary."""
@@ -670,6 +669,100 @@ class RoutingBenchMark():
         end_time = datetime.now()
         print(f"{self.test4_DOMAIN_list_values_exists.__name__}: {(end_time - start_time).total_seconds()}")
 
+    def test1_GREATER_no_key_match(self):
+        """Performance test, for the GREATER routing filter type, with:
+            - 100 same rules (type: GREATER)
+            - 100 messages with 50 fields different from 'wheel_model'
+        """
+        routing = Routing()
+        my_dict = load_test_data("benchmark_rule_greater_dict")
+        # Create 100 EQUALS same rules 
+        rule = load_test_data("benchmark_rule_greater")
+        for i in range(MAX_RULE):
+            rule["streams"]["rules"]["mountain_bike"].append(my_dict)
+        benchmark_event_1 = load_test_data("benchmark_event_1")
+        routing.load_from_dicts([rule])
+        start_time = datetime.now()
+        # Sending 100 messages to the routing
+        for i in range(MAX_EVENT):
+            routing.match(benchmark_event_1)
+        end_time = datetime.now()
+        print(f"{self.test1_GREATER_no_key_match.__name__}: {(end_time - start_time).total_seconds()}")
+
+    def test2_GREATER_key_exists(self):
+        """Performance test, for the GREATER routing filter type, with:
+            - 100 same rules (type: GREATER)
+            - 100 messages with 50 fields (one of them 'wheel_model' but not greater than 1)
+        """
+        routing = Routing()
+        my_dict = load_test_data("benchmark_rule_greater_dict")
+        # Create 100 EQUALS same rules
+        rule = load_test_data("benchmark_rule_greater")
+        for i in range(MAX_RULE):
+            rule["streams"]["rules"]["mountain_bike"].append(my_dict)
+        benchmark_event_1 = load_test_data("benchmark_event_1")
+        # Adding the field 'wheel_model' but not greater than 1
+        benchmark_event_1.update({"wheel_model": 0})
+        routing.load_from_dicts([rule])
+        start_time = datetime.now()
+        # Sending 100 messages to the routing
+        for i in range(MAX_EVENT):
+            routing.match(benchmark_event_1)
+        end_time = datetime.now()
+        print(f"{self.test2_GREATER_key_exists.__name__}: {(end_time - start_time).total_seconds()}")
+
+    def test3_GREATER_list_values(self):
+        """Performance test, for the GREATER routing filter type, with:
+            - 100 same rules (type: GREATER)
+            - 100 messages with 50 fields (one of them 'wheel_model' but not greater than 1
+            - 100 different values in the rules (no matches with the message field)
+        """
+        routing = Routing()
+        my_dict = load_test_data("benchmark_rule_greater_dict")
+        # Create a list of 100 values in the "value" field of the rule
+        for i in range(MAX_LIST_VALUES):
+            my_dict["filters"][0]["value"].append(i)
+        rule = load_test_data("benchmark_rule_greater")
+        # Create 100 EQUALS same rules with 100 values
+        for i in range(MAX_RULE):
+            rule["streams"]["rules"]["mountain_bike"].append(my_dict)
+        benchmark_event_1 = load_test_data("benchmark_event_1")
+        benchmark_event_1.update({"wheel_model": 0})
+        routing.load_from_dicts([rule])
+        start_time = datetime.now()
+        # Sending 100 messages to the routing
+        for i in range(MAX_EVENT):
+            routing.match(benchmark_event_1)
+        end_time = datetime.now()
+        print(f"{self.test3_GREATER_list_values.__name__}: {(end_time - start_time).total_seconds()}")
+
+    def test4_GREATER_list_values_exists(self):
+        """Performance test, for the GREATER routing filter type, with:
+            - 100 values in the "wheel_model" of the rule and of the message, but none of them triggers a match (no domain google.com)
+        """
+        routing = Routing()
+        my_dict = load_test_data("benchmark_rule_greater_dict")
+        # Create a list of 100 values in the "value" field of the rule
+        for i in range(MAX_LIST_VALUES):
+            my_dict["filters"][0]["value"].append(i)
+        rule = load_test_data("benchmark_rule_greater")
+        # Create 100 EQUALS same rules with 100 values
+        for i in range(MAX_RULE):
+            rule["streams"]["rules"]["mountain_bike"].append(my_dict)
+        routing.load_from_dicts([rule])
+        # Create a list of values in the message for "wheel_model"
+        benchmark_event_1 = load_test_data("benchmark_event_1")
+        benchmark_event_1.update({"wheel_model": []})
+        for i in range(MAX_LIST_VALUES):
+            benchmark_event_1["wheel_model"].append( MAX_LIST_VALUES + i)
+        start_time = datetime.now()
+        # Sending 100 messages to the routing
+        for i in range(MAX_EVENT):
+            routing.match(benchmark_event_1)
+        end_time = datetime.now()
+        print(f"{self.test4_GREATER_list_values_exists.__name__}: {(end_time - start_time).total_seconds()}")
+
+
 def main():
     routing_benchmark = RoutingBenchMark()
     # routing_benchmark.test1_EQUALS_no_key_match()
@@ -696,10 +789,14 @@ def main():
     # routing_benchmark.test2_NETWORK_key_exists()
     # routing_benchmark.test3_NETWORK_list_values()
     # routing_benchmark.test4_NETWORK_list_values_exists()
-    routing_benchmark.test1_DOMAIN_no_key_match()
-    routing_benchmark.test2_DOMAIN_key_exists()
-    routing_benchmark.test3_DOMAIN_list_values()
-    routing_benchmark.test4_DOMAIN_list_values_exists()
+    # routing_benchmark.test1_DOMAIN_no_key_match()
+    # routing_benchmark.test2_DOMAIN_key_exists()
+    # routing_benchmark.test3_DOMAIN_list_values()
+    # routing_benchmark.test4_DOMAIN_list_values_exists()
+    routing_benchmark.test1_GREATER_no_key_match()
+    routing_benchmark.test2_GREATER_key_exists()
+    routing_benchmark.test3_GREATER_list_values()
+    routing_benchmark.test4_GREATER_list_values_exists()
 
 if __name__ == "__main__":
     main()
