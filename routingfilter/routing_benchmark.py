@@ -85,7 +85,7 @@ class RoutingBenchMark():
         end_time = datetime.now()
         print(f"{self.test3_EQUALS_list_values.__name__}: {(end_time - start_time).total_seconds()}")
 
-    def test4_EQUALS_list_values_message(self):
+    def test4_EQUALS_values_message(self):
         """Performance test, for the EQUALS routing filter type, with:
             - 100 values in the "wheel_model" of the rule and of the message, but none of them triggers a match (no 'Superlight')
         """
@@ -109,7 +109,7 @@ class RoutingBenchMark():
         for i in range(MAX_EVENT):
             routing.match(benchmark_event_1)
         end_time = datetime.now()
-        print(f"{self.test4_EQUALS_list_values_message.__name__}: {(end_time - start_time).total_seconds()}")
+        print(f"{self.test4_EQUALS_values_message.__name__}: {(end_time - start_time).total_seconds()}")
 
     def test1_STARTSWITH_no_key_match(self):
         """Performance test, for the STARTSWITH routing filter type, with:
@@ -178,7 +178,7 @@ class RoutingBenchMark():
         end_time = datetime.now()
         print(f"{self.test3_STARTSWITH_list_values.__name__}: {(end_time - start_time).total_seconds()}")
 
-    def test4_STARTSWITH_list_values_exists(self):
+    def test4_STARTSWITH_values_message(self):
         """Performance test, for the EQUALS routing filter type, with:
             - 100 values in the "wheel_model" of the rule and of the message, but none of them triggers a match (no 'Superlight')
         """
@@ -202,7 +202,7 @@ class RoutingBenchMark():
         for i in range(MAX_EVENT):
             routing.match(benchmark_event_1)
         end_time = datetime.now()
-        print(f"{self.test4_STARTSWITH_list_values_exists.__name__}: {(end_time - start_time).total_seconds()}")
+        print(f"{self.test4_STARTSWITH_values_message.__name__}: {(end_time - start_time).total_seconds()}")
 
     def test1_ENDSWITH_no_key_match(self):
         """Performance test, for the ENDSWITH routing filter type, with:
@@ -271,7 +271,7 @@ class RoutingBenchMark():
         end_time = datetime.now()
         print(f"{self.test3_ENDSWITH_list_values.__name__}: {(end_time - start_time).total_seconds()}")
 
-    def test4_ENDSWITH_list_values_exists(self):
+    def test4_ENDSWITH_values_message(self):
         """Performance test, for the ENDSWITH routing filter type, with:
             - 100 values in the "wheel_model" of the rule and of the message, but none of them triggers a match (no 'Superlight')
         """
@@ -295,7 +295,7 @@ class RoutingBenchMark():
         for i in range(MAX_EVENT):
             routing.match(benchmark_event_1)
         end_time = datetime.now()
-        print(f"{self.test4_ENDSWITH_list_values_exists.__name__}: {(end_time - start_time).total_seconds()}")
+        print(f"{self.test4_ENDSWITH_values_message.__name__}: {(end_time - start_time).total_seconds()}")
 
     def test1_KEYWORD_no_key_match(self):
         """Performance test, for the KEYWORD routing filter type, with:
@@ -364,7 +364,7 @@ class RoutingBenchMark():
         end_time = datetime.now()
         print(f"{self.test3_KEYWORD_list_values.__name__}: {(end_time - start_time).total_seconds()}")
 
-    def test4_KEYWORD_list_values_exists(self):
+    def test4_KEYWORD_values_message(self):
         """Performance test, for the KEYWORD routing filter type, with:
             - 100 values in the "wheel_model" of the rule and of the message, but none of them triggers a match (no 'Superlight')
         """
@@ -388,7 +388,7 @@ class RoutingBenchMark():
         for i in range(MAX_EVENT):
             routing.match(benchmark_event_1)
         end_time = datetime.now()
-        print(f"{self.test4_KEYWORD_list_values_exists.__name__}: {(end_time - start_time).total_seconds()}")
+        print(f"{self.test4_KEYWORD_values_message.__name__}: {(end_time - start_time).total_seconds()}")
 
     def test1_REGEXP_no_key_match(self):
         """Performance test, for the REGEXP routing filter type, with:
@@ -457,7 +457,7 @@ class RoutingBenchMark():
         end_time = datetime.now()
         print(f"{self.test3_REGEXP_list_values.__name__}: {(end_time - start_time).total_seconds()}")
 
-    def test4_REGEXP_list_values_exists(self):
+    def test4_REGEXP_values_message(self):
         """Performance test, for the REGEXP routing filter type, with:
             - 100 values in the "wheel_model" of the rule and of the message, but none of them triggers a match (no 'Superlight')
         """
@@ -481,7 +481,7 @@ class RoutingBenchMark():
         for i in range(MAX_EVENT):
             routing.match(benchmark_event_1)
         end_time = datetime.now()
-        print(f"{self.test4_REGEXP_list_values_exists.__name__}: {(end_time - start_time).total_seconds()}")
+        print(f"{self.test4_REGEXP_values_message.__name__}: {(end_time - start_time).total_seconds()}")
 
     def test1_NETWORK_no_key_match(self):
         """Performance test, for the NETWORK routing filter type, with:
@@ -550,7 +550,7 @@ class RoutingBenchMark():
         end_time = datetime.now()
         print(f"{self.test3_NETWORK_list_values.__name__}: {(end_time - start_time).total_seconds()}")
 
-    def test4_NETWORK_list_values_exists(self):
+    def test4_NETWORK_values_message(self):
         """Performance test, for the REGEXP routing filter type, with:
             - 100 values in the "wheel_model" of the rule and of the message, but none of them triggers a match (no network 10.10.10.0/24)
         """
@@ -574,7 +574,7 @@ class RoutingBenchMark():
         for i in range(MAX_EVENT):
             routing.match(benchmark_event_1)
         end_time = datetime.now()
-        print(f"{self.test4_NETWORK_list_values_exists.__name__}: {(end_time - start_time).total_seconds()}")
+        print(f"{self.test4_NETWORK_values_message.__name__}: {(end_time - start_time).total_seconds()}")
 
     def test1_DOMAIN_no_key_match(self):
         """Performance test, for the DOMAIN routing filter type, with:
@@ -643,7 +643,7 @@ class RoutingBenchMark():
         end_time = datetime.now()
         print(f"{self.test3_DOMAIN_list_values.__name__}: {(end_time - start_time).total_seconds()}")
 
-    def test4_DOMAIN_list_values_exists(self):
+    def test4_DOMAIN_values_message(self):
         """Performance test, for the DOMAIN routing filter type, with:
             - 100 values in the "wheel_model" of the rule and of the message, but none of them triggers a match (no domain google.com)
         """
@@ -667,7 +667,7 @@ class RoutingBenchMark():
         for i in range(MAX_EVENT):
             routing.match(benchmark_event_1)
         end_time = datetime.now()
-        print(f"{self.test4_DOMAIN_list_values_exists.__name__}: {(end_time - start_time).total_seconds()}")
+        print(f"{self.test4_DOMAIN_values_message.__name__}: {(end_time - start_time).total_seconds()}")
 
     def test1_GREATER_no_key_match(self):
         """Performance test, for the GREATER routing filter type, with:
@@ -736,7 +736,7 @@ class RoutingBenchMark():
         end_time = datetime.now()
         print(f"{self.test3_GREATER_list_values.__name__}: {(end_time - start_time).total_seconds()}")
 
-    def test4_GREATER_list_values_exists(self):
+    def test4_GREATER_values_message(self):
         """Performance test, for the GREATER routing filter type, with:
             - 100 values in the "wheel_model" of the rule and of the message, but none of them triggers a match (no domain google.com)
         """
@@ -760,7 +760,7 @@ class RoutingBenchMark():
         for i in range(MAX_EVENT):
             routing.match(benchmark_event_1)
         end_time = datetime.now()
-        print(f"{self.test4_GREATER_list_values_exists.__name__}: {(end_time - start_time).total_seconds()}")
+        print(f"{self.test4_GREATER_values_message.__name__}: {(end_time - start_time).total_seconds()}")
 
 
 def main():
@@ -768,35 +768,35 @@ def main():
     routing_benchmark.test1_EQUALS_no_key_match()
     routing_benchmark.test2_EQUALS_key_exists()
     routing_benchmark.test3_EQUALS_list_values()
-    routing_benchmark.test4_EQUALS_list_values_message()
+    routing_benchmark.test4_EQUALS_values_message()
     routing_benchmark.test1_STARTSWITH_no_key_match()
     routing_benchmark.test2_STARTSWITH_key_exists()
     routing_benchmark.test3_STARTSWITH_list_values()
-    routing_benchmark.test4_STARTSWITH_list_values_exists()
+    routing_benchmark.test4_STARTSWITH_values_message()
     routing_benchmark.test1_ENDSWITH_no_key_match()
     routing_benchmark.test2_ENDSWITH_key_exists()
     routing_benchmark.test3_ENDSWITH_list_values()
-    routing_benchmark.test4_ENDSWITH_list_values_exists()
+    routing_benchmark.test4_ENDSWITH_values_message()
     routing_benchmark.test1_KEYWORD_no_key_match()
     routing_benchmark.test2_KEYWORD_key_exists()
     routing_benchmark.test3_KEYWORD_list_values()
-    routing_benchmark.test4_KEYWORD_list_values_exists()
+    routing_benchmark.test4_KEYWORD_values_message()
     routing_benchmark.test1_REGEXP_no_key_match()
     routing_benchmark.test2_REGEXP_key_exists()
     routing_benchmark.test3_REGEXP_list_values()
-    routing_benchmark.test4_REGEXP_list_values_exists()
+    routing_benchmark.test4_REGEXP_values_message()
     routing_benchmark.test1_NETWORK_no_key_match()
     routing_benchmark.test2_NETWORK_key_exists()
     routing_benchmark.test3_NETWORK_list_values()
-    routing_benchmark.test4_NETWORK_list_values_exists()
+    routing_benchmark.test4_NETWORK_values_message()
     routing_benchmark.test1_DOMAIN_no_key_match()
     routing_benchmark.test2_DOMAIN_key_exists()
     routing_benchmark.test3_DOMAIN_list_values()
-    routing_benchmark.test4_DOMAIN_list_values_exists()
+    routing_benchmark.test4_DOMAIN_values_message()
     routing_benchmark.test1_GREATER_no_key_match()
     routing_benchmark.test2_GREATER_key_exists()
     routing_benchmark.test3_GREATER_list_values()
-    routing_benchmark.test4_GREATER_list_values_exists()
+    routing_benchmark.test4_GREATER_values_message()
 
 if __name__ == "__main__":
     main()
