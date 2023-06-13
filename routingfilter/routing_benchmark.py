@@ -103,7 +103,7 @@ class RoutingBenchMark():
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
         for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append("test-" + str(i))
+            benchmark_event_1["wheel_model"].append("test-" + str(MAX_LIST_VALUES+i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
@@ -196,7 +196,7 @@ class RoutingBenchMark():
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
         for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append("test-" + str(i))
+            benchmark_event_1["wheel_model"].append("test-" + str(MAX_LIST_VALUES+i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
@@ -289,7 +289,7 @@ class RoutingBenchMark():
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
         for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append("test-" + str(i))
+            benchmark_event_1["wheel_model"].append("test-" + str(MAX_LIST_VALUES+i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
@@ -382,7 +382,7 @@ class RoutingBenchMark():
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
         for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append("test-" + str(i))
+            benchmark_event_1["wheel_model"].append("test-" + str(MAX_LIST_VALUES+i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
@@ -475,7 +475,7 @@ class RoutingBenchMark():
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
         for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append("test-" + str(i))
+            benchmark_event_1["wheel_model"].append("test-" + str(MAX_LIST_VALUES+i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
@@ -661,7 +661,7 @@ class RoutingBenchMark():
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
         for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append("test-" + str(i))
+            benchmark_event_1["wheel_model"].append("test-" + str(MAX_LIST_VALUES+i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
@@ -754,7 +754,7 @@ class RoutingBenchMark():
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
         for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append( MAX_LIST_VALUES + i)
+            benchmark_event_1["wheel_model"].append(MAX_LIST_VALUES + i)
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
