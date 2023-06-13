@@ -14,6 +14,7 @@ def load_test_data(name):
 MAX_RULE = 1000
 MAX_EVENT = 100
 MAX_LIST_VALUES = 100
+MAX_LIST_VALUES_EVENT = 10
 
 class RoutingBenchMark():
     """Class to test the routing performance in order to monitor the trend of the execution time after new features or changes"""       
@@ -102,7 +103,7 @@ class RoutingBenchMark():
         # Create a list of values in the message for "wheel_model"
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
-        for i in range(MAX_LIST_VALUES):
+        for i in range(MAX_LIST_VALUES_EVENT):
             benchmark_event_1["wheel_model"].append("no_match-" + str(MAX_LIST_VALUES+i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
@@ -195,8 +196,8 @@ class RoutingBenchMark():
         # Create a list of values in the message for "wheel_model"
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
-        for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append("no_match-" + str(MAX_LIST_VALUES+i))
+        for i in range(MAX_LIST_VALUES_EVENT):
+            benchmark_event_1["wheel_model"].append("no_match-" + str(i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
@@ -288,8 +289,8 @@ class RoutingBenchMark():
         # Create a list of values in the message for "wheel_model"
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
-        for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append("no_match-" + str(MAX_LIST_VALUES+i))
+        for i in range(MAX_LIST_VALUES_EVENT):
+            benchmark_event_1["wheel_model"].append("no_match-" + str(i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
@@ -381,8 +382,8 @@ class RoutingBenchMark():
         # Create a list of values in the message for "wheel_model"
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
-        for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append("no_match-" + str(MAX_LIST_VALUES+i))
+        for i in range(MAX_LIST_VALUES_EVENT):
+            benchmark_event_1["wheel_model"].append("no_match-" + str(i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
@@ -474,8 +475,8 @@ class RoutingBenchMark():
         # Create a list of values in the message for "wheel_model"
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
-        for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append("no_match-" + str(MAX_LIST_VALUES+i))
+        for i in range(MAX_LIST_VALUES_EVENT):
+            benchmark_event_1["wheel_model"].append("no_match-" + str(i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
@@ -534,7 +535,8 @@ class RoutingBenchMark():
         routing = Routing()
         my_dict = load_test_data("benchmark_rule_network_dict")
         # Create a list of 100 values in the "value" field of the rule
-        for i in range(MAX_LIST_VALUES):
+        # Different value (no MAX_LIST_VALUES constant) because it takes a while
+        for i in range(20):
             my_dict["filters"][0]["value"].append("10.10.10." + str(i))
         rule = load_test_data("benchmark_rule_network")
         # Create 100 EQUALS same rules with 100 values
@@ -557,7 +559,8 @@ class RoutingBenchMark():
         routing = Routing()
         my_dict = load_test_data("benchmark_rule_network_dict")
         # Create a list of 100 values in the "value" field of the rule
-        for i in range(MAX_LIST_VALUES):
+        # Different value (no MAX_LIST_VALUES constant) because it takes a while
+        for i in range(20):
             my_dict["filters"][0]["value"].append("10.10.10." + str(i))
         rule = load_test_data("benchmark_rule_network")
         # Create 100 EQUALS same rules with 100 values
@@ -567,7 +570,7 @@ class RoutingBenchMark():
         # Create a list of values in the message for "wheel_model"
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
-        for i in range(MAX_LIST_VALUES):
+        for i in range(MAX_LIST_VALUES_EVENT):
             benchmark_event_1["wheel_model"].append("192.168.1." + str(i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
@@ -660,8 +663,8 @@ class RoutingBenchMark():
         # Create a list of values in the message for "wheel_model"
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
-        for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append("test-" + str(MAX_LIST_VALUES+i))
+        for i in range(MAX_LIST_VALUES_EVENT):
+            benchmark_event_1["wheel_model"].append("no_match-" + str(i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
@@ -753,7 +756,7 @@ class RoutingBenchMark():
         # Create a list of values in the message for "wheel_model"
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
-        for i in range(MAX_LIST_VALUES):
+        for i in range(MAX_LIST_VALUES_EVENT):
             benchmark_event_1["wheel_model"].append(0)
         start_time = datetime.now()
         # Sending 100 messages to the routing
