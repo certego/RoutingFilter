@@ -19,5 +19,8 @@ See the [online documentation](https://routingfilter.readthedocs.io/en/latest/) 
 * Commit and merge the changes into `master` branch
 * Publish a new release with the version number as a tag: the CI will automatically publish the new version un PyPI
 
+### Benchmark tests
+In order to launch the benchmark tests, run ```python routing_benchmark.py```
+
 ### License
 This project is licensed under the **GNU LGPLv3** license.

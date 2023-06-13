@@ -1,8 +1,10 @@
 ## 1.5.x
+### 1.5.2
+#### Changes
+* Fixed test4 (with list in rule value and also in the event) in routing_benchmark that matched with the rules
 ### 1.5.1
 #### Changes
 * Updated setup.py
-
 ### 1.5.0
 #### Features
 * Added routing history and loop protection in rule parsing

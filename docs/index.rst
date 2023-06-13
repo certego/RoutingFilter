@@ -166,3 +166,17 @@ The definition of keywords have to be included in a `.json` file into a `diction
   { 
     "BICYCLE_COLORS": ["red","blue"]
   }
+
+Benchmark tests
+==================
+The benchmark tests were developed in order to analyze the routing execution time.
+The tests are available for the EQUALS, STARTSWITH, ENDSWITH, KEYWORD, REGEXP, NETWORK, DOMAIN and GREATER filters.
+In particular, the tests are:
+* test1_<FILTER>_no_key_match: it sends 100 messages with 50 fields, but without the `wheel_model` key
+* test2_<FILTER>_key_exists: it sends 100 messages with 50 fields and one of the keys is `wheel_model`, but with a value different from `Superlight`
+* test3_<FILTER>_list_values: it sends 100 messages with 50 fields and one of the keys is `wheel_model`. In addition, the rule contains 100 values
+* test4_<FILTER>_values_message: both the `wheel_model` key in the event and the rule include a list of 100 values
+
+In order to launch the benchmark tests, run ::
+  
+  python routing_benchmark.py
