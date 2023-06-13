@@ -51,7 +51,7 @@ class RoutingBenchMark():
             rule["streams"]["rules"]["mountain_bike"].append(my_dict)
         benchmark_event_1 = load_test_data("benchmark_event_1")
         # Adding the field 'wheel_model' but with a value different from 'Superlight'
-        benchmark_event_1.update({"wheel_model": "test"})
+        benchmark_event_1.update({"wheel_model": "no_match"})
         routing.load_from_dicts([rule])
         start_time = datetime.now()
         # Sending 100 messages to the routing
@@ -76,7 +76,7 @@ class RoutingBenchMark():
         for i in range(MAX_RULE):
             rule["streams"]["rules"]["mountain_bike"].append(my_dict)
         benchmark_event_1 = load_test_data("benchmark_event_1")
-        benchmark_event_1.update({"wheel_model": "test"})
+        benchmark_event_1.update({"wheel_model": "no_match"})
         routing.load_from_dicts([rule])
         start_time = datetime.now()
         # Sending 100 messages to the routing
@@ -103,7 +103,7 @@ class RoutingBenchMark():
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
         for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append("test-" + str(MAX_LIST_VALUES+i))
+            benchmark_event_1["wheel_model"].append("no_match-" + str(MAX_LIST_VALUES+i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
@@ -144,7 +144,7 @@ class RoutingBenchMark():
             rule["streams"]["rules"]["mountain_bike"].append(my_dict)
         benchmark_event_1 = load_test_data("benchmark_event_1")
         # Adding the field 'wheel_model' but with a value different from 'Superlight'
-        benchmark_event_1.update({"wheel_model": "test"})
+        benchmark_event_1.update({"wheel_model": "no_match"})
         routing.load_from_dicts([rule])
         start_time = datetime.now()
         # Sending 100 messages to the routing
@@ -169,7 +169,7 @@ class RoutingBenchMark():
         for i in range(MAX_RULE):
             rule["streams"]["rules"]["mountain_bike"].append(my_dict)
         benchmark_event_1 = load_test_data("benchmark_event_1")
-        benchmark_event_1.update({"wheel_model": "test"})
+        benchmark_event_1.update({"wheel_model": "no_match"})
         routing.load_from_dicts([rule])
         start_time = datetime.now()
         # Sending 100 messages to the routing
@@ -196,7 +196,7 @@ class RoutingBenchMark():
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
         for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append("test-" + str(MAX_LIST_VALUES+i))
+            benchmark_event_1["wheel_model"].append("no_match-" + str(MAX_LIST_VALUES+i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
@@ -237,7 +237,7 @@ class RoutingBenchMark():
             rule["streams"]["rules"]["mountain_bike"].append(my_dict)
         benchmark_event_1 = load_test_data("benchmark_event_1")
         # Adding the field 'wheel_model' but with a value different from 'Superlight'
-        benchmark_event_1.update({"wheel_model": "test"})
+        benchmark_event_1.update({"wheel_model": "no_match"})
         routing.load_from_dicts([rule])
         start_time = datetime.now()
         # Sending 100 messages to the routing
@@ -262,7 +262,7 @@ class RoutingBenchMark():
         for i in range(MAX_RULE):
             rule["streams"]["rules"]["mountain_bike"].append(my_dict)
         benchmark_event_1 = load_test_data("benchmark_event_1")
-        benchmark_event_1.update({"wheel_model": "test"})
+        benchmark_event_1.update({"wheel_model": "no_match"})
         routing.load_from_dicts([rule])
         start_time = datetime.now()
         # Sending 100 messages to the routing
@@ -289,7 +289,7 @@ class RoutingBenchMark():
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
         for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append("test-" + str(MAX_LIST_VALUES+i))
+            benchmark_event_1["wheel_model"].append("no_match-" + str(MAX_LIST_VALUES+i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
@@ -355,7 +355,7 @@ class RoutingBenchMark():
         for i in range(MAX_RULE):
             rule["streams"]["rules"]["mountain_bike"].append(my_dict)
         benchmark_event_1 = load_test_data("benchmark_event_1")
-        benchmark_event_1.update({"wheel_model": "test"})
+        benchmark_event_1.update({"wheel_model": "no_match"})
         routing.load_from_dicts([rule])
         start_time = datetime.now()
         # Sending 100 messages to the routing
@@ -382,7 +382,7 @@ class RoutingBenchMark():
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
         for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append("test-" + str(MAX_LIST_VALUES+i))
+            benchmark_event_1["wheel_model"].append("no_match-" + str(MAX_LIST_VALUES+i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
@@ -423,7 +423,7 @@ class RoutingBenchMark():
             rule["streams"]["rules"]["mountain_bike"].append(my_dict)
         benchmark_event_1 = load_test_data("benchmark_event_1")
         # Adding the field 'wheel_model' but with a value different from 'Superlight'
-        benchmark_event_1.update({"wheel_model": "test"})
+        benchmark_event_1.update({"wheel_model": "no_match"})
         routing.load_from_dicts([rule])
         start_time = datetime.now()
         # Sending 100 messages to the routing
@@ -448,7 +448,7 @@ class RoutingBenchMark():
         for i in range(MAX_RULE):
             rule["streams"]["rules"]["mountain_bike"].append(my_dict)
         benchmark_event_1 = load_test_data("benchmark_event_1")
-        benchmark_event_1.update({"wheel_model": "test"})
+        benchmark_event_1.update({"wheel_model": "no_match"})
         routing.load_from_dicts([rule])
         start_time = datetime.now()
         # Sending 100 messages to the routing
@@ -475,7 +475,7 @@ class RoutingBenchMark():
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
         for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append("test-" + str(MAX_LIST_VALUES+i))
+            benchmark_event_1["wheel_model"].append("no_match-" + str(MAX_LIST_VALUES+i))
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
@@ -754,7 +754,7 @@ class RoutingBenchMark():
         benchmark_event_1 = load_test_data("benchmark_event_1")
         benchmark_event_1.update({"wheel_model": []})
         for i in range(MAX_LIST_VALUES):
-            benchmark_event_1["wheel_model"].append(MAX_LIST_VALUES + i)
+            benchmark_event_1["wheel_model"].append(0)
         start_time = datetime.now()
         # Sending 100 messages to the routing
         for i in range(MAX_EVENT):
