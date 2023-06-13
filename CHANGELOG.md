@@ -1,4 +1,8 @@
 ## 1.5.x
+### 1.5.1
+#### Changes
+* Updated setup.py
+
 ### 1.5.0
 #### Features
 * Added routing history and loop protection in rule parsing
