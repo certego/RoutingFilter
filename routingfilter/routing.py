@@ -157,11 +157,25 @@ class Routing:
         :return: The variable value or, if not defined, the variable name
         :rtype: str
         """
-        if value in self.variables:
-            return self.variables[value]
+        res = None
+        if isinstance(value, list):
+            tmp_value = []
+            for v in value:
+                if v in self.variables:
+                    if isinstance(self.variables[v], list):
+                        tmp_value.extend(self.variables[v])
+                    else:
+                        tmp_value.append(self.variables[v])
+                else:
+                    tmp_value.append(v)
+            res = tmp_value
         else:
-            self.logger.warning(f"Variable {value} doesn't exist in variables dictionary")
-            return value  # Returning variable name (ES: $INTERNAL_IPS)
+            if value in self.variables:
+                res = self.variables[value]
+            else:
+                self.logger.warning(f"Variable {value} doesn't exist in variables dictionary")
+                res = value  # Returning variable name (ES: $INTERNAL_IPS)
+        return res
 
     def _validate_rules(self, rules: dict) -> None:
         """Validate the loaded rules, checking for type mismatch errors.

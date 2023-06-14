@@ -311,10 +311,18 @@ class RoutingTestCase(unittest.TestCase):
         # key doesn't exist
         self.assertFalse(self.routing.match(self.test_event_5))
 
-    def test_variables(self):
+    def test_variables_no_list(self):
         self.routing.load_from_dicts([load_test_data("test_rule_23_network_variables")])
         self.assertFalse(self.routing.match(self.test_event_4))
-        self.routing.load_from_dicts([load_test_data("test_rule_23_network_variables")], variables={"$INTERNAL_IPS": "192.168.0.0/16"})
+        self.routing.load_from_dicts([load_test_data("test_rule_23_network_variables")], variables={"$INTERNAL_IPS": "192.168.1.0/24"})
+        self.assertTrue(self.routing.match(self.test_event_4))
+    
+    def test_variables_list_one_element(self): 
+        self.routing.load_from_dicts([load_test_data("test_rule_26_network_variables_list1")], variables={"$INTERNAL_IPS": "192.168.1.0/24"})
+        self.assertTrue(self.routing.match(self.test_event_4))
+    
+    def test_variables_list_more_elements(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_27_network_variables_list2")], variables={"$INTERNAL_IPS": ["192.168.1.0/24", "192.168.2.0/24"]})
         self.assertTrue(self.routing.match(self.test_event_4))
 
     def test_rule_in_routing_history(self):
