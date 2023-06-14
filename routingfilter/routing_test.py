@@ -72,6 +72,20 @@ class RoutingTestCase(unittest.TestCase):
         self.routing.load_from_dicts([rule_all])
         self.assertDictEqual(self.routing.match(self.test_event_1)[0]["output"], {'Workshop': {'workers_needed': 1}})
 
+    def test_match_streams_none(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_25_routing_history_streams_none")])
+        self.routing.match(self.test_event_1)
+        self.assertTrue("rules" in self.routing.match(self.test_event_1)[0])
+        self.assertTrue("output" in self.routing.match(self.test_event_1)[0])
+        self.assertEqual({}, self.routing.match(self.test_event_1)[0]["output"])
+
+    def test_no_match_streams_none(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_25_routing_history_streams_none")])
+        self.routing.match(self.test_event_4)
+        self.assertFalse("rules" in self.routing.match(self.test_event_4))
+        self.assertEqual([], self.routing.match(self.test_event_4))
+        self.assertFalse("output" in self.routing.match(self.test_event_4))
+
     def test_routing_history(self):
         self.routing.load_from_dicts([load_test_data("test_rule_24_routing_history")])
         self.routing.match(self.test_event_1)
@@ -87,6 +101,8 @@ class RoutingTestCase(unittest.TestCase):
     def test_routing_history_stream_none(self):
         self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
         self.routing.match(self.test_event_1)
+        print(self.routing.match(self.test_event_1))
+        print(self.test_event_1)
         self.assertTrue(self.test_event_1["certego"]["routing_history"]["Workshop"])
         self.routing.load_from_dicts([load_test_data("test_rule_25_routing_history_streams_none")])
         self.routing.match(self.test_event_1)
