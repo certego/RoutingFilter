@@ -1,3 +1,8 @@
+## 1.6.x
+### 1.6.0
+#### Features
+* Added keyword replacement in case of rule with list variables
+
 ## 1.5.x
 ### 1.5.2
 #### Changes
