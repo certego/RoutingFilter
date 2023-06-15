@@ -77,7 +77,7 @@ class RoutingTestCase(unittest.TestCase):
         self.routing.match(self.test_event_1)
         self.assertTrue("rules" in self.routing.match(self.test_event_1)[0])
         self.assertTrue("output" in self.routing.match(self.test_event_1)[0])
-        self.assertEqual({}, self.routing.match(self.test_event_1)[0]["output"])
+        self.assertEqual(None, self.routing.match(self.test_event_1)[0]["output"])
 
     def test_no_match_streams_none(self):
         self.routing.load_from_dicts([load_test_data("test_rule_25_routing_history_streams_none")])
@@ -101,12 +101,13 @@ class RoutingTestCase(unittest.TestCase):
     def test_routing_history_stream_none(self):
         self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
         self.routing.match(self.test_event_1)
-        print(self.routing.match(self.test_event_1))
-        print(self.test_event_1)
+        # Match rules
         self.assertTrue(self.test_event_1["certego"]["routing_history"]["Workshop"])
         self.routing.load_from_dicts([load_test_data("test_rule_25_routing_history_streams_none")])
         self.routing.match(self.test_event_1)
+        # Checking no match, the message should be filtered
         self.assertEqual(len(self.test_event_1["certego"]["routing_history"].keys()), 1)
+        self.assertEqual(None, self.routing.match(self.test_event_1)[0]["output"])
 
     def test_routing_history_same_rule_twice(self):
             workshop_count = 0
@@ -114,11 +115,13 @@ class RoutingTestCase(unittest.TestCase):
             self.routing.match(self.test_event_1)
             self.assertTrue(self.test_event_1["certego"]["routing_history"]["Workshop"])
             self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
-            self.routing.match(self.test_event_1)
+            res = self.routing.match(self.test_event_1)
             for key in self.test_event_1["certego"]["routing_history"].keys():
                 if key == "Workshop":
                     workshop_count = workshop_count + 1
             self.assertEqual(workshop_count, 1)
+            self.assertEqual([], res)
+
 
     def test_rule_1(self):
         # Test rule loading and applying with full output

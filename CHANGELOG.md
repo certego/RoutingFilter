@@ -1,4 +1,7 @@
 ## 1.6.x
+### 1.6.1
+#### Bugfix
+* Fixed TypeError if output is None
 ### 1.6.0
 #### Features
 * Added keyword replacement in case of rule with list variables

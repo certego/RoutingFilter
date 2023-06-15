@@ -82,7 +82,7 @@ class Routing:
                 mr["rules"] = mr.pop("filters")
             if type_ in mr:
                 mr["output"] = mr.pop(type_)
-                if len(mr["output"]) > 0:
+                if mr["output"]:
                     event["certego"]["routing_history"][list(mr["output"].keys())[0]] = datetime.now().isoformat()
         return matching_rules
 
