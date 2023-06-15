@@ -2,6 +2,7 @@
 ### 1.6.1
 #### Bugfix
 * Fixed TypeError if output is None
+* Fixed routing_history with double tag and double streams
 ### 1.6.0
 #### Features
 * Added keyword replacement in case of rule with list variables

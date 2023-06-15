@@ -37,6 +37,7 @@ class RoutingTestCase(unittest.TestCase):
         self.test_event_15 = load_test_data("test_event_15")
         self.test_event_16 = load_test_data("test_event_16")
         self.test_event_17 = load_test_data("test_event_17")
+        self.test_event_18 = load_test_data("test_event_18")
         self.test_event_with_list_1 = load_test_data("test_event_with_list_1")
         self.test_event_with_list_2 = load_test_data("test_event_with_list_2")
 
@@ -110,18 +111,32 @@ class RoutingTestCase(unittest.TestCase):
         self.assertEqual(None, self.routing.match(self.test_event_1)[0]["output"])
 
     def test_routing_history_same_rule_twice(self):
-            workshop_count = 0
-            self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
-            self.routing.match(self.test_event_1)
-            self.assertTrue(self.test_event_1["certego"]["routing_history"]["Workshop"])
-            self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
-            res = self.routing.match(self.test_event_1)
-            for key in self.test_event_1["certego"]["routing_history"].keys():
-                if key == "Workshop":
-                    workshop_count = workshop_count + 1
-            self.assertEqual(workshop_count, 1)
-            self.assertEqual([], res)
+        workshop_count = 0
+        self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
+        self.routing.match(self.test_event_1)
+        self.assertTrue(self.test_event_1["certego"]["routing_history"]["Workshop"])
+        self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
+        res = self.routing.match(self.test_event_1)
+        for key in self.test_event_1["certego"]["routing_history"].keys():
+            if key == "Workshop":
+                workshop_count = workshop_count + 1
+        self.assertEqual(workshop_count, 1)
+        self.assertEqual([], res)
 
+    def test_double_stream(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_28_double_stream")])
+        res = self.routing.match(self.test_event_1)
+        self.assertDictEqual({'Workshop': {'workers_needed': 1}, 'Lab': {'workers_needed': 2}}, res[0]["output"])
+        self.assertTrue("Workshop" in self.test_event_1["certego"]["routing_history"])
+        self.assertTrue("Lab" in self.test_event_1["certego"]["routing_history"])
+        self.assertEqual(2, len(res[0]["output"]))
+
+    def test_double_tag(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_29_double_tag")])
+        res = self.routing.match(self.test_event_18)
+        self.assertDictEqual({'rules': [{'type': 'EQUALS', 'key': 'wheel_model', 'description': 'Carbon fiber wheels needs manual truing', 'value': ['Superlight', 'RacePro']}], 'output': None}, res[0])
+        self.assertDictEqual({'rules': [{'type': 'EQUALS', 'key': 'wheel_model', 'description': 'Carbon fiber wheels needs manual truing', 'value': ['Superlight', 'RacePro']}], 'output': {'Lab': {'workers_needed': 2}}}, res[1])
+        self.assertEqual(2, len(res))
 
     def test_rule_1(self):
         # Test rule loading and applying with full output
@@ -163,7 +178,6 @@ class RoutingTestCase(unittest.TestCase):
         self.assertDictEqual(self.routing.match(self.test_event_2)[0], load_test_data("test_event_1_rule_1_response"))
         self.assertEqual(self.routing.match(self.test_event_3), [])
         
-
     def test_special_tag_all2(self):
         test_rule_1_equals = load_test_data("test_rule_1_equals")
         test_rule_2_all_equals = load_test_data("test_rule_2_all_equals")
@@ -383,3 +397,5 @@ class RoutingTestCase(unittest.TestCase):
             }
           }
         self.assertTrue(self.routing.rule_in_routing_history(event, rule))
+
+
