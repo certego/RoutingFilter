@@ -14,7 +14,14 @@
                 ]
               }
             ],
-            "streams": null
+            "streams": {
+              "Workshop": {
+                "workers_needed": 1
+              },
+              "Lab": {
+                "workers_needed": 2
+              }
+            }
           }
         ]
       }

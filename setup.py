@@ -5,7 +5,7 @@ with open("README.md", "r") as readme_file:
 
 setup(
     name='routingfilter',
-    version='1.6.0',
+    version='1.6.1',
     packages=['routingfilter'],
     include_package_data=True,
     install_requires=["IPy~=1.1", "macaddress~=2.0.2"],

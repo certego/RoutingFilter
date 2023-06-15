@@ -82,8 +82,9 @@ class Routing:
                 mr["rules"] = mr.pop("filters")
             if type_ in mr:
                 mr["output"] = mr.pop(type_)
-                if len(mr["output"]) > 0:
-                    event["certego"]["routing_history"][list(mr["output"].keys())[0]] = datetime.now().isoformat()
+                if mr["output"]:
+                    for k in mr["output"].keys():
+                        event["certego"]["routing_history"][k] = datetime.now().isoformat()
         return matching_rules
 
     def load_from_dicts(self, rules_list: List[dict], validate_rules: bool = True, variables: Optional[dict] = None) -> None:

@@ -1,0 +1,8 @@
+{
+    "tags": ["mountain_bike", "city_bike"],
+    "wheel_model": "Superlight",
+    "frame": "aluminium",
+    "gears": "1x12",
+    "suspension": "full",
+    "price": 600
+  }
