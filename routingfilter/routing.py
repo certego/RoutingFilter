@@ -64,7 +64,7 @@ class Routing:
             for rule in rules:
                 # check if ALL the filters are matching
                 filters = [ConfigFilter(f) for f in rule.get("filters", [])]
-                if all(f.is_matching(event) for f in filters) and not self.rule_in_routing_history(event, rule):
+                if all(f.is_matching(event) for f in filters) and not self.rule_in_routing_history(type_, event, rule):
                     matching_rules.append(rule)
                     break
         if not matching_rules:
@@ -72,7 +72,7 @@ class Routing:
                 for rule in self.rules[type_]["rules"].get(tag_field_name, []):
                     # check if ALL the filters are matching
                     config_filters = [ConfigFilter(f) for f in rule.get("filters", [])]
-                    if config_filters and all(f.is_matching(event) for f in config_filters) and not self.rule_in_routing_history(event, rule):
+                    if config_filters and all(f.is_matching(event) for f in config_filters) and not self.rule_in_routing_history(type_, event, rule):
                         matching_rules.append(rule)
                         break  # the first matching rule wins if it doesn't exist in the output field
         # Rename "filters" to "rules" and "type" to "output" to be more generic
@@ -82,7 +82,8 @@ class Routing:
                 mr["rules"] = mr.pop("filters")
             if type_ in mr:
                 mr["output"] = mr.pop(type_)
-                if mr["output"]:
+                # We are only interested in dict type
+                if mr["output"] and isinstance(mr["output"], dict):
                     for k in mr["output"].keys():
                         event["certego"]["routing_history"][k] = datetime.now().isoformat()
         return matching_rules
@@ -193,17 +194,22 @@ class Routing:
                         config_filter_obj = ConfigFilter(filter_)
                         config_filter_obj.is_matching({})
 
-    def rule_in_routing_history(self, event, rule):
+    def rule_in_routing_history(self, type_, event, rule):
         """Checking if the given rule has already been processed
 
+        :param type_: The type_ of the event
+        :type type_: dict
         :param event: The entire event to process
         :type event: dict
         :param rule: The rule to check
         :type rule: dict
         """
-        if rule["streams"] is None:
+        if rule[type_] is None:
             return False
-        for key in rule["streams"].keys():
+        # we are only interested in rule[type_] containing dict
+        if not isinstance(rule[type_], dict):
+            return False
+        for key in rule[type_].keys():
             if key in event["certego"]["routing_history"]:
                 return True
         return False

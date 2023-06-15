@@ -1,4 +1,7 @@
 ## 1.6.x
+### 1.6.2
+#### Bugfix
+* Added filter in routing_filter
 ### 1.6.1
 #### Bugfix
 * Fixed TypeError if output is None
