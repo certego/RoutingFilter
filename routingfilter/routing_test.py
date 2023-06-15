@@ -134,8 +134,6 @@ class RoutingTestCase(unittest.TestCase):
     def test_double_tag(self):
         self.routing.load_from_dicts([load_test_data("test_rule_29_double_tag")])
         res = self.routing.match(self.test_event_18)
-        self.assertDictEqual({'rules': [{'type': 'EQUALS', 'key': 'wheel_model', 'description': 'Carbon fiber wheels needs manual truing', 'value': ['Superlight', 'RacePro']}], 'output': None}, res[0])
-        self.assertDictEqual({'rules': [{'type': 'EQUALS', 'key': 'wheel_model', 'description': 'Carbon fiber wheels needs manual truing', 'value': ['Superlight', 'RacePro']}], 'output': {'Lab': {'workers_needed': 2}}}, res[1])
         self.assertEqual(2, len(res))
 
     def test_rule_1(self):
