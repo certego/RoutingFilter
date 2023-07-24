@@ -36,8 +36,12 @@ class Routing:
         :return: A list of dicts containing the matched rules and the outputs in the following format: {"rules": [...], "output": {...}}; an empty list if no rule matched
         :rtype: List[dict]
         """
-        if not event.get("certego", {}).get("routing_history", {}):
-            event["certego"] = {"routing_history": {}}
+        # Creating routing_history if not present
+        if "certego" not in event:
+            event["certego"] = {}
+        if "routing_history" not in event["certego"]:
+            event["certego"]["routing_history"] = {}
+        # check for rules
         if not self.rules:
             self.logger.error("'rules_list' must be set before evaluating a match!")
             raise ValueError("'rules_list' must be set before evaluating a match!")
