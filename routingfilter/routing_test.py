@@ -373,9 +373,9 @@ class RoutingTestCase(unittest.TestCase):
             "streams": {
             }
           }
-        self.assertFalse(self.routing.rule_in_routing_history(event, rule))
+        self.assertFalse(self.routing.rule_in_routing_history("streams", event, rule))
         event = {"certego": {"routing_history": {"Workshop": "2023-06-06T18:00:00.000Z"}}}
-        self.assertFalse(self.routing.rule_in_routing_history(event, rule))
+        self.assertFalse(self.routing.rule_in_routing_history("streams", event, rule))
         rule = {
             "filters": [
               {
@@ -394,6 +394,6 @@ class RoutingTestCase(unittest.TestCase):
                 }
             }
           }
-        self.assertTrue(self.routing.rule_in_routing_history(event, rule))
+        self.assertTrue(self.routing.rule_in_routing_history("streams", event, rule))
 
 

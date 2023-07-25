@@ -1,4 +1,7 @@
 ## 1.6.x
+### 1.6.3
+#### Bugfix
+* Fix overwriting of certego field
 ### 1.6.2
 #### Bugfix
 * Added filter in routing_filter
@@ -22,7 +25,7 @@
 * Added routing history and loop protection in rule parsing
 
 ## 1.4.x
-### 1.4.1
+### 1.4.1+
 #### Bugfix
 * Updated *setup.py* to include new dependency *macaddress* 
 ### 1.4.0
