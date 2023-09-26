@@ -1,14 +1,13 @@
 import copy
-from datetime import datetime
 import json
 import logging
+from datetime import datetime
+from typing import List, Optional
 
 from routingfilter.configfilter import ConfigFilter
-from typing import List, Optional
 
 
 class Routing:
-
     def __init__(self):
         self.rules = None
         self.variables = {}
@@ -54,7 +53,7 @@ class Routing:
         if not isinstance(tags, list):
             tags = [tags]
         tags = set(tags)
-        msg_tags = (tags & streams_tags)
+        msg_tags = tags & streams_tags
         matching_rules = []
 
         # if in routing stream there is an "all" tag I'm checking it for every msg

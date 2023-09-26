@@ -61,7 +61,7 @@ jobs:
         flake8 ./routingfilter --config .github/configurations/python_linters/.flake8 --show-source
     - name: "Isort check"
       run: |
-        isort ./buffalogs --sp .github/configurations/.isort.cfg --profile black --filter-files --check-only --diff
+        isort ./buffalogs --sp .github/configurations/python_linters/.isort.cfg --profile black --filter-files --check-only --diff
     - name: Test with pytest
       run: |
         pytest routing_test.py
