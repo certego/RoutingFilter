@@ -22,5 +22,9 @@ See the [online documentation](https://routingfilter.readthedocs.io/en/latest/) 
 ### Benchmark tests
 In order to launch the benchmark tests, run ```python routing_benchmark.py```
 
+### Development
+* Install `pip install -r requirements.txt` and `pip install -r requirements_dev.txt` in your local virtual environment
+* Setup pre-commit: `pre-commit install -c .github/.pre-commit-config.yaml`
+
 ### License
 This project is licensed under the **GNU LGPLv3** license.

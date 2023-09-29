@@ -1,5 +1,4 @@
 class DictQuery(dict):
-
     # https://www.haykranen.nl/2016/02/13/handling-complex-nested-dicts-in-python/
 
     def get(self, path, default=None):

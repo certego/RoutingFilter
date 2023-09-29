@@ -1,17 +1,16 @@
-import re
 import logging
+import re
 
-from routingfilter.dictquery import DictQuery
-from IPy import IP
 import macaddress
+from IPy import IP
+from routingfilter.dictquery import DictQuery
 
 
 class ConfigFilter:
-
     def __init__(self, filt):
-        self.type = str(filt.get('type', '')).upper()
-        key = filt.get('key', [])
-        value = filt.get('value', [])
+        self.type = str(filt.get("type", "")).upper()
+        key = filt.get("key", [])
+        value = filt.get("value", [])
         self.key = [key] if isinstance(key, str) else key
         self.value = [value] if isinstance(value, str) or isinstance(value, int) or isinstance(value, float) else value
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -26,7 +25,7 @@ class ConfigFilter:
         """
         try:
             self.logger.debug(f"Applying filter {self.type} to event: {data}")
-            return getattr(self, '_filter_{}'.format(self.type))(data)
+            return getattr(self, "_filter_{}".format(self.type))(data)
         except AttributeError:
             self.logger.error(f"Invalid filter specified in rules: {self.type}")
             raise
@@ -51,7 +50,7 @@ class ConfigFilter:
 
     def _filter_EQUALS(self, data):
         for key in self.key:
-            target = DictQuery(data).get(key, '')
+            target = DictQuery(data).get(key, "")
             if isinstance(target, list):
                 for t in target:
                     if self.__check_equals(t):
@@ -70,7 +69,7 @@ class ConfigFilter:
 
     def _filter_STARTSWITH(self, data):
         for key in self.key:
-            target = DictQuery(data).get(key, '')
+            target = DictQuery(data).get(key, "")
             if isinstance(target, list):
                 for t in target:
                     if self.__check_startswith(t):
@@ -89,7 +88,7 @@ class ConfigFilter:
 
     def _filter_ENDSWITH(self, data):
         for key in self.key:
-            target = DictQuery(data).get(key, '')
+            target = DictQuery(data).get(key, "")
             if isinstance(target, list):
                 for t in target:
                     if self.__check_endswith(t):
@@ -108,7 +107,7 @@ class ConfigFilter:
 
     def _filter_KEYWORD(self, data):
         for key in self.key:
-            target = DictQuery(data).get(key, '')
+            target = DictQuery(data).get(key, "")
             if isinstance(target, list):
                 for t in target:
                     if self.__check_keyword(t):
@@ -127,7 +126,7 @@ class ConfigFilter:
 
     def _filter_REGEXP(self, data):
         for key in self.key:
-            target = DictQuery(data).get(key, '')
+            target = DictQuery(data).get(key, "")
             if isinstance(target, list):
                 for t in target:
                     if self.__check_regexp(t):
@@ -147,7 +146,7 @@ class ConfigFilter:
         if not data:
             return False
         for key in self.key:
-            target = DictQuery(data).get(key, '0.0.0.0')
+            target = DictQuery(data).get(key, "0.0.0.0")
             if isinstance(target, list):
                 for t in target:
                     if self.__check_network(t):
@@ -173,7 +172,7 @@ class ConfigFilter:
 
     def _filter_DOMAIN(self, data):
         for key in self.key:
-            target = DictQuery(data).get(key, '')
+            target = DictQuery(data).get(key, "")
             if isinstance(target, list):
                 for t in target:
                     if self.__check_domain(t):
@@ -187,7 +186,7 @@ class ConfigFilter:
         target = str(target).lower()
         for value in self.value:
             value = str(value).lower()
-            if target == value or target.endswith('.' + value):
+            if target == value or target.endswith("." + value):
                 return True
         return False
 
@@ -206,7 +205,7 @@ class ConfigFilter:
     def __number_comparator(self, data, comparator):
         # Wrapper for filters GREATER, LESS, GREATER_EQ, LESS_EQ
         for key in self.key:
-            target = DictQuery(data).get(key, '')
+            target = DictQuery(data).get(key, "")
             if not target:
                 return False
             if isinstance(target, list):
@@ -250,12 +249,12 @@ class ConfigFilter:
 
     def _filter_TYPEOF(self, data):
         for key in self.key:
-            target = DictQuery(data).get(key, '')
+            target = DictQuery(data).get(key, "")
             for value in self.value:
                 if self.__check_typeof(target, value):
                     return True
         return False
-    
+
     def __check_typeof(self, target, value):
         if value == "str":
             return type(target) is str
@@ -272,9 +271,9 @@ class ConfigFilter:
         elif value == "mac":
             return self.__check_mac_address(target)
         return False
-    
+
     def __check_ip_address(self, target):
-        try: 
+        try:
             if type(target) is int or int(target):
                 return False
         except ValueError:
@@ -282,9 +281,9 @@ class ConfigFilter:
             try:
                 IP(target)
                 return True
-            except:
+            except Exception:
                 return False
-    
+
     def __check_mac_address(self, target):
         if type(target) is int:
             return False
@@ -293,4 +292,3 @@ class ConfigFilter:
             return True
         except ValueError:
             return False
-
