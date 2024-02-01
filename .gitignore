@@ -30,7 +30,7 @@ venv
 ._*
 
 # Pycharm
-.idea/workspace.xml
+.idea/
 
 # Documentation
 docs/_build
