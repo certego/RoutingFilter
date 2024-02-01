@@ -1,16 +1,15 @@
 import logging
 from datetime import datetime
+from typing import List
 
-from filters import AbstractFilter
 from routingfilter.dictquery import DictQuery
+
+from .filters import AbstractFilter
 
 
 class Rule:
-    def __init__(self, uid, type, group_number, rule_number, output):
+    def __init__(self, uid, output):
         self.uid = uid
-        self.type = type
-        self.group_number = group_number
-        self.rule_number = rule_number
         self.output = DictQuery(output)
         self._stats = {}
         self._filters = []
@@ -73,12 +72,12 @@ class Rule:
             self._stats = {}
         return stats
 
-    def add_filter(self, filters: AbstractFilter | list[AbstractFilter]) -> None:
+    def add_filter(self, filters: AbstractFilter | List[AbstractFilter]) -> None:
         """
         Add a filter or a list of filters to the rule.
 
         :param filters: list of filters to add to the rule
-        :type filters: AbstractFilter | list[AbstractFilter]
+        :type filters: AbstractFilter | List[AbstractFilter]
         :return: no value
         :rtype: None
         """
@@ -112,19 +111,19 @@ class RuleManager:
                 return rule.output
         return None
 
-    def add_rule(self, rule: Rule | list[Rule]) -> None:
+    def add_rule(self, rule: Rule | List[Rule]) -> None:
         """
         Add rule or a list of rule to rule list so that sorting by "group_number" and "rule_number" is maintained.
 
         :param rule: rule or rule list to add
-        :type rule: Rule | list[Rule]
+        :type rule: Rule | List[Rule]
         :return: no value
         :rtype: None
         """
         if not isinstance(rule, list):
             rule = [rule]
-        self._rules += rule
-        self._rules.sort(key=lambda x: (x.get("group_number"), x.get("rule_number")))
+        for r in rule:
+            self._rules.append(r)
 
     def get_stats(self, delete=False) -> dict:
         """

@@ -1,34 +1,26 @@
 import logging
 import re
+from abc import ABC, abstractmethod
+from typing import Optional
 
 import macaddress
 from IPy import IP
 from routingfilter.dictquery import DictQuery
 
 
-class AbstractFilter:
-    def __init__(self, key, value):
+class AbstractFilter(ABC):
+    def __init__(self, key, value, **kwargs):
         self._key = key if isinstance(key, list) else [key]
         self._value = value if isinstance(value, list) else [value]
         self.logger = logging.getLogger(self.__class__.__name__)
+        self._check_value()
 
+    @abstractmethod
     def match(self, event: DictQuery) -> bool:
-        """
-        Check if at least a key matches at least one value.
+        return NotImplemented
 
-        :param event: event to check
-        :type event: DictQuery
-        :return: true if event matches, false otherwise
-        :rtype: bool
-        """
-        for key in self._key:
-            event_value = event.get(key)
-            event_value = event_value if isinstance(event_value, list) else [event_value]
-            for value in event_value:
-                value = value.lower() if isinstance(value, str) else value
-                if value in self._value:
-                    return True
-        return False
+    def _check_value(self) -> Optional[Exception]:
+        return None
 
 
 class AllFilter(AbstractFilter):
@@ -85,6 +77,24 @@ class NotExistFilter(ExistFilter):
 class EqualFilter(AbstractFilter):
     def __init__(self, key, value):
         super().__init__(key, value)
+
+    def match(self, event: DictQuery):
+        """
+        Check if at least a key matches at least one value.
+
+        :param event: event to check
+        :type event: DictQuery
+        :return: true if event matches, false otherwise
+        :rtype: bool
+        """
+        for key in self._key:
+            event_value = event.get(key)
+            event_value = event_value if isinstance(event_value, list) else [event_value]
+            for value in event_value:
+                value = value.lower() if isinstance(value, str) else value
+                if value in self._value:
+                    return True
+        return False
 
 
 class NotEqualFilter(EqualFilter):
@@ -197,6 +207,21 @@ class Keywordfilter(AbstractFilter):
 
 
 class RegexpFilter(AbstractFilter):
+    def _check_value(self) -> Optional[Exception]:
+        """
+        Check if values in self._value are valid regexes.
+
+        :return: none or error generated:
+        :rtype: Optional[Exception]
+        """
+        for value in self._value:
+            try:
+                re.compile(value)
+            except re.error as e:
+                self.logger.error(f"Invalid regex {value}, during check of value list {self._value}. Error message: {e}")
+                raise ValueError(f"Regex check failed: error for value {value}. Error message: {e}")
+        return None
+
     def match(self, event: DictQuery) -> bool:
         """
         Return True if at least one regex matches one of the value.
@@ -230,8 +255,25 @@ class RegexpFilter(AbstractFilter):
 
 class NetworkFilter(AbstractFilter):
     def __init__(self, key, value):
-        # TODO: check if values are IP?
         super().__init__(key, value)
+
+    def _check_value(self) -> Optional[Exception]:
+        """
+        Check if the values in self.value are valid IP addresses.
+
+        :return: none or error generated
+        :rtype: Optional[Exception]
+        """
+        for value in self._value:
+            try:
+                value = IP(value)
+            except ValueError as e:
+                self.logger.error(f"IP address (value error) error, during check of value {value} in list {self._value}. Error was: {e}.")
+                raise ValueError(f"IP address check failed: value error for value {value}.")
+            except TypeError as e:
+                self.logger.error(f"IP address (type error) error, during check of value {value} in list {self._value}. Error was: {e}.")
+                raise ValueError(f"IP address check failed: type error for value {value}.")
+        return None
 
     def match(self, event: DictQuery) -> bool:
         """
@@ -260,7 +302,7 @@ class NetworkFilter(AbstractFilter):
         try:
             ip_address = IP(ip_address)
             for ip in ip_address:
-                if ip in IP(self._value):
+                if ip in self._value:
                     return True
         except ValueError as e:
             self.logger.error(f"Error in parsing IP address (value error): {e}. ")
@@ -285,6 +327,18 @@ class NotNetworkFilter(NetworkFilter):
 class DomainFilter(AbstractFilter):
     def __init__(self, key, value):
         super().__init__(key, value)
+
+    def _check_value(self) -> Optional[Exception]:
+        """
+        Check if values in self.value are string.
+
+        :return: none or error generated
+        :rtype: bool
+        """
+        for value in self._value:
+            if not isinstance(value, str):
+                raise ValueError(f"Domain check failed: value {value} is not a string.")
+        return None
 
     def match(self, event: DictQuery) -> bool:
         """
@@ -318,9 +372,35 @@ class DomainFilter(AbstractFilter):
 
 
 class ComparatorFilter(AbstractFilter):
-    def __init(self, key, value, comparator_type):
+    def __init__(self, key, value, comparator_type):
         self._comparator_type = comparator_type
+        self._check_comparator_type()
         super().__init__(key, value)
+
+    def _check_value(self) -> Optional[Exception]:
+        """
+        Check if values in self.value are float.
+
+        :return: none or error generated
+        :rtype: Optional[Exception]
+        """
+        for value in self._value:
+            if not isinstance(value, float):
+                self.logger.error(f"Comparator check failed: value {value} of list {self._value} is not a float")
+                raise ValueError(f"Comparator check failed: value {value} is not a float")
+        return None
+
+    def _check_comparator_type(self) -> Optional[Exception]:
+        """
+        Check if comparator is valid.
+
+        :return: none or error generated
+        :rtype: Optional[Exception]
+        """
+        if self._comparator_type not in ["GREATER", "LESS", "GREATER_EQ", "LESS_EQ"]:
+            self.logger.error(f"Comparator check failed: value {self._comparator_type} is not valid.")
+            raise ValueError(f"Comparator type check failed. {self._comparator_type} is not a valid comparator.")
+        return None
 
     def match(self, event: DictQuery) -> bool:
         """
@@ -369,9 +449,22 @@ class ComparatorFilter(AbstractFilter):
 
 
 class TypeofFilter(AbstractFilter):
-    def __init__(self, key):
-        value = ["str", "int", "float", "bool", "list", "dict", "ip", "mac"]
+    def __init__(self, key, value):
         super().__init__(key, value)
+
+    def _check_value(self) -> Optional[Exception]:
+        """
+        Check if value is a correct type.
+
+        :return: no value or raised an exception
+        :rtype: Optional[Exception]
+        """
+        valid_type = ["str", "int", "float", "bool", "list", "dict", "ip", "mac"]
+        for value in self._value:
+            if value not in valid_type:
+                self.logger.error(f"Type check failed: value {value} of list {self._value} is invalid.")
+                raise ValueError(f"Type check failed: value {value} is invalid.")
+        return None
 
     def match(self, event: DictQuery) -> bool:
         """
