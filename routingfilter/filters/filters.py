@@ -54,9 +54,8 @@ class ExistFilter(AbstractFilter):
         :return: true if a key exists, false otherwise
         :rtype: bool
         """
-        event_keys = [k.lower() for k in event.keys()]
         for key in self._key:
-            if key in event_keys:
+            if key in event.keys():
                 return True
         return False
 
@@ -87,12 +86,16 @@ class EqualFilter(AbstractFilter):
         :return: true if event matches, false otherwise
         :rtype: bool
         """
+        filter_value = []
+        for value in self._value:
+            value = value.lower() if isinstance(value, str) else value
+            filter_value.append(value)
         for key in self._key:
-            event_value = event.get(key)
+            event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for value in event_value:
                 value = value.lower() if isinstance(value, str) else value
-                if value in self._value:
+                if value in filter_value:
                     return True
         return False
 
@@ -121,7 +124,7 @@ class StartswithFilter(AbstractFilter):
         :rtype: bool
         """
         for key in self._key:
-            event_value = event.get(key)
+            event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for value in event_value:
                 return self._check_startswith(str(value))
@@ -137,6 +140,7 @@ class StartswithFilter(AbstractFilter):
         """
         value = value.lower()
         for prefix in self._value:
+            prefix = str(prefix).lower()
             if value.startswith(prefix):
                 return True
         return False
@@ -153,7 +157,7 @@ class EndswithFilter(AbstractFilter):
         :rtype: bool
         """
         for key in self._key:
-            event_value = event.get(key)
+            event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for value in event_value:
                 return self._check_endswith(str(value))
@@ -169,6 +173,7 @@ class EndswithFilter(AbstractFilter):
         """
         value = value.lower()
         for suffix in self._value:
+            suffix = str(suffix).lower()
             if str(value).endswith(suffix):
                 return True
         return False
@@ -185,7 +190,7 @@ class Keywordfilter(AbstractFilter):
         :rtype: bool
         """
         for key in self._key:
-            event_value = event.get(key)
+            event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for value in event_value:
                 return self._check_keyword(str(value))
@@ -201,6 +206,7 @@ class Keywordfilter(AbstractFilter):
         """
         value = value.lower()
         for keyword in self._value:
+            keyword = str(keyword).lower()
             if keyword in value:
                 return True
         return False
@@ -232,7 +238,7 @@ class RegexpFilter(AbstractFilter):
         :rtype: bool
         """
         for key in self._key:
-            event_value = event.get(key)
+            event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for value in event_value:
                 return self._check_regex(str(value))
@@ -246,7 +252,6 @@ class RegexpFilter(AbstractFilter):
         :return: true or false
         :rtype: bool
         """
-        value = value.lower()
         for regex in self._value:
             if re.search(regex, value):
                 return True
@@ -285,7 +290,7 @@ class NetworkFilter(AbstractFilter):
         :rtype: bool
         """
         for key in self._key:
-            event_value = event.get(key)
+            event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for ip_address in event_value:
                 return self._check_network(str(ip_address))
@@ -350,7 +355,7 @@ class DomainFilter(AbstractFilter):
         :rtype: bool
         """
         for key in self._key:
-            event_value = event.get(key)
+            event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for value in event_value:
                 return self._check_domain(str(value))
@@ -385,7 +390,9 @@ class ComparatorFilter(AbstractFilter):
         :rtype: Optional[Exception]
         """
         for value in self._value:
-            if not isinstance(value, float):
+            try:
+                float(value)
+            except ValueError:
                 self.logger.error(f"Comparator check failed: value {value} of list {self._value} is not a float")
                 raise ValueError(f"Comparator check failed: value {value} is not a float")
         return None
@@ -412,7 +419,7 @@ class ComparatorFilter(AbstractFilter):
         :rtype: bool
         """
         for key in self._key:
-            event_value = event.get(key)
+            event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for value in event_value:
                 return self._compare(value)
@@ -478,7 +485,7 @@ class TypeofFilter(AbstractFilter):
 
         for key in self._key:
             for val_type in self._value:
-                return self._check_type(val_type, event.get(key))
+                return self._check_type(event.get(key), val_type)
 
     def _check_type(self, value: any, val_type: str) -> bool:
         """

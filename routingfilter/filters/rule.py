@@ -1,3 +1,4 @@
+import copy
 import logging
 from datetime import datetime
 from typing import List
@@ -34,15 +35,16 @@ class Rule:
         if set(self.output.keys()) <= set(event.keys()):
             return None
         # if at least one output key is not in certego.routing_history keys, it is added to certego.routing_history keys and delete from output keys
+        output_copy = copy.deepcopy(self.output)
         for key in self.output.keys():
             routing_history = event.get("certego.routing_history")
             if key in routing_history:
-                self.output.pop(key)
+                output_copy.pop(key)
             else:
                 routing_history.update({key: now})
-        event_id = event.get("rule.name") if event.get("rule.name") is not None else "unknown"
+        event_id = event.get("rule.name", "unknown")
         self._add_stats(event_id)
-        return self.output
+        return output_copy
 
     def _add_stats(self, event_id: str) -> None:
         """

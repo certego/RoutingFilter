@@ -2,7 +2,8 @@ import logging
 from typing import List, Optional
 
 from routingfilter.dictquery import DictQuery
-from rule import RuleManager
+
+from .rule import RuleManager
 
 
 class Stream:
@@ -11,7 +12,7 @@ class Stream:
         self._ruleManagers = {}
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def match(self, event: DictQuery) -> List[dict] | List[None]:
+    def match(self, event: DictQuery, tag_field_name: str) -> List[dict]:
         """
         Call all ruleManagers that contain tha tag of event "tags" field (that could be a list).
         It returns a list of dictionaries representing eventual matches or None if no matches are found.
@@ -20,22 +21,30 @@ class Stream:
 
         :param event: event to check
         :type event: DictQuery
+        :param tag_field_name: the event field to search into (default "tags")
+        :type tag_field_name: str
         :return: list of matches or None otherwise
         :rtype: List[dict] | List[None]
         """
         match_list = []
-        tags = event.get("tags")
+        tags = event.get(tag_field_name, [])
         if not isinstance(tags, list):
             tags = [tags]
+        # avoid duplicates
+        tags = set(tags)
+
         # tag all
         if "all" in self._ruleManagers.keys():
-            all_match = self._ruleManagers["all"].match(event)
+            all_match = self._ruleManagers["all"].match(event, "all")
             if all_match is not None:
                 return [all_match]
         for tag in tags:
             # append dict or None
             if tag in self._ruleManagers.keys():
-                match_list.append(self._ruleManagers[tag].match(event))
+                match = self._ruleManagers[tag].match(event, tag)
+                if match:
+                    match_list.append(self._ruleManagers[tag].match(event, tag))
+                print(f"Match: {match_list} + tag: {tag}")
         return match_list
 
     def add_rulemanager(self, rulemanager: RuleManager | List[RuleManager]) -> None:
@@ -82,5 +91,5 @@ class Stream:
         """
         stats = {}
         for rm in self._ruleManagers.values():
-            stats.update({self.stream: rm.get_stats(delete)})  # TODO: it's okay the key?
+            stats.update({rm.get_stats(delete)})
         return stats
