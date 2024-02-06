@@ -387,3 +387,6 @@ class RoutingTestCase(unittest.TestCase):
     #         "streams": {"Workshop": {"workers_needed": 1}},
     #     }
     #     self.assertTrue(self.routing.rule_in_routing_history("streams", event, rule))
+        
+if __name__ == '__main__':
+    unittest.main()
