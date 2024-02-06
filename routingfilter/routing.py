@@ -39,12 +39,13 @@ class Routing:
         :return: A list of dictionaries containing the matched rules and the outputs
         :rtype: List[dict]
         """
-        event = DictQuery(event)
         # create routing_history if not exists
         if "certego" not in event.keys():
             event["certego"] = {}
         if "routing_history" not in event["certego"]:
             event["certego"]["routing_history"] = {}
+        
+        event_dictquery = DictQuery(event)
 
         # check stream
         if type_ == "streams":
@@ -55,7 +56,9 @@ class Routing:
             self.logger.error(f"Error during matching. Invalid Stream: {type_}")
             raise ValueError(f"Invalid Stream: {type_}.")
 
-        return stream.match(event, tag_field_name)
+        res = stream.match(event_dictquery, tag_field_name)
+        event["certego"]["routing_history"].update(event_dictquery["certego"]["routing_history"])
+        return res
 
     def load_from_dicts(self, rules_list: List[dict], validate_rules: bool = True, variables: Optional[dict] = None) -> None:
         """
