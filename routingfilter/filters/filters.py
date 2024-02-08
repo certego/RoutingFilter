@@ -306,8 +306,8 @@ class NetworkFilter(AbstractFilter):
         """
         try:
             ip_address = IP(ip_address)
-            for ip in ip_address:
-                if ip in self._value:
+            for value in self._value:
+                if ip_address in IP(value):
                     return True
         except ValueError as e:
             self.logger.error(f"Error in parsing IP address (value error): {e}. ")
@@ -439,7 +439,7 @@ class ComparatorFilter(AbstractFilter):
                 value = float(value)
             except ValueError as e:
                 self.logger.error(f"Error in parsing value to float in comparator filter: {e}. ")
-                return False
+                raise ValueError(f"Error in parsing value to float, during checking {value} {self._comparator_type} than {term}.")
             match self._comparator_type:
                 case "GREATER":
                     if value > term:
@@ -447,12 +447,13 @@ class ComparatorFilter(AbstractFilter):
                 case "LESS":
                     if value < term:
                         return True
-                case "GREATER_EQUAL":
+                case "GREATER_EQ":
                     if value >= term:
                         return True
-                case "LESS_EQUAL":
+                case "LESS_EQ":
                     if value <= term:
                         return True
+        return False
 
 
 class TypeofFilter(AbstractFilter):
@@ -485,7 +486,9 @@ class TypeofFilter(AbstractFilter):
 
         for key in self._key:
             for val_type in self._value:
-                return self._check_type(event.get(key), val_type)
+                if self._check_type(event.get(key), val_type):
+                    return True
+        return False
 
     def _check_type(self, value: any, val_type: str) -> bool:
         """
@@ -499,17 +502,17 @@ class TypeofFilter(AbstractFilter):
         :rtype: bool
         """
         if val_type == "str":
-            return isinstance(value, str)
+            return type(value) is str
         elif val_type == "int":
-            return isinstance(value, int)
+            return type(value) is int
         elif val_type == "float":
-            return isinstance(value, float)
+            return type(value) is float
         elif val_type == "bool":
-            return isinstance(value, bool)
+            return type(value) is bool
         elif val_type == "list":
-            return isinstance(value, list)
+            return type(value) is list
         elif val_type == "dict":
-            return isinstance(value, dict)
+            return type(value) is dict
         elif val_type == "ip":
             return self._check_ip(value)
         elif val_type == "mac":

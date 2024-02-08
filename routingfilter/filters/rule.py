@@ -6,21 +6,22 @@ from typing import List
 from routingfilter.dictquery import DictQuery
 
 from .filters import AbstractFilter
+from .results import Results
 
 
 class Rule:
     def __init__(self, uid, output):
         self.uid = uid
-        self.output = DictQuery(output)
+        self.output = DictQuery(output) if output else None
         self._stats = {}
         self._filters = []
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def match(self, event: DictQuery) -> dict | None:
+    def match(self, event: DictQuery) -> Results | None:
         """
         Call match method for each filter. If all filters match, the output is returned, None otherwise. If the filter
         matches, the output key with current timestamp in ISO format is added to certego.routing_history field of the event.
-        The match is added also to stats. If "certego.routing_history" already contains the output key value, the filter must not match and Nonn is returned.
+        The match is added also to stats. If "certego.routing_history" already contains the output key value, the filter must not match and None is returned.
 
         :param event: event to check
         :type event: DictQuery
@@ -32,8 +33,14 @@ class Rule:
                 return None
         now = datetime.now().isoformat()
         # check if output keys are in certego.routing_history keys
-        if set(self.output.keys()) <= set(event.keys()):
+        if self.output and set(self.output.keys()) <= set(event.get("certego.routing_history").keys()):
             return None
+        # add stats
+        event_id = event.get("rule.name", "unknown")
+        self._add_stats(event_id)
+        # if output is None
+        if not self.output:
+            return Results(rules=self.uid, output=None)
         # if at least one output key is not in certego.routing_history keys, it is added to certego.routing_history keys and delete from output keys
         output_copy = copy.deepcopy(self.output)
         for key in self.output.keys():
@@ -42,9 +49,8 @@ class Rule:
                 output_copy.pop(key)
             else:
                 routing_history.update({key: now})
-        event_id = event.get("rule.name", "unknown")
-        self._add_stats(event_id)
-        return output_copy
+        results = Results(rules=self.uid, output=output_copy)
+        return results
 
     def _add_stats(self, event_id: str) -> None:
         """
@@ -94,7 +100,7 @@ class RuleManager:
         self._rules = []
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def match(self, event: DictQuery, tag: str) -> dict | None:
+    def match(self, event: DictQuery, tag: str) -> Results | None:
         """
         Call all match methods of the Rules and return the result of first match.
         Return None if no match is found or tag is different from the one in tag attribute.
@@ -109,8 +115,9 @@ class RuleManager:
         if tag != self.tag:
             return None
         for rule in self._rules:
-            if rule.match(event):
-                return rule.output
+            match_rule = rule.match(event)
+            if match_rule:
+                return match_rule
         return None
 
     def add_rule(self, rule: Rule | List[Rule]) -> None:

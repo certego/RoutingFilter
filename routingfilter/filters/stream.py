@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from routingfilter.dictquery import DictQuery
 
+from .results import Results
 from .rule import RuleManager
 
 
@@ -12,7 +13,7 @@ class Stream:
         self._ruleManagers = {}
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def match(self, event: DictQuery, tag_field_name: str) -> List[dict]:
+    def match(self, event: DictQuery, tag_field_name: str) -> List[Results]:
         """
         Call all ruleManagers that contain tha tag of event "tags" field (that could be a list).
         It returns a list of dictionaries representing eventual matches or None if no matches are found.
@@ -39,12 +40,11 @@ class Stream:
             if all_match is not None:
                 return [all_match]
         for tag in tags:
-            # append dict or None
+            # append Results object or None
             if tag in self._ruleManagers.keys():
                 match = self._ruleManagers[tag].match(event, tag)
                 if match:
-                    match_list.append(self._ruleManagers[tag].match(event, tag))
-                print(f"Match: {match_list} + tag: {tag}")
+                    match_list.append(match)
         return match_list
 
     def add_rulemanager(self, rulemanager: RuleManager | List[RuleManager]) -> None:
@@ -91,5 +91,5 @@ class Stream:
         """
         stats = {}
         for rm in self._ruleManagers.values():
-            stats.update({rm.get_stats(delete)})
+            stats.update(rm.get_stats(delete))
         return stats

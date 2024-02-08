@@ -1,9 +1,11 @@
 import json
 import logging
+import uuid
 from typing import List, Optional
 
 from .dictquery import DictQuery
 from .filters import filters
+from .filters.results import Results
 from .filters.rule import Rule, RuleManager
 from .filters.stream import Stream
 
@@ -26,7 +28,7 @@ class Routing:
         stats = {"streams": self.streams.get_stats(delete), "customer": self.customer.get_stats(delete)}
         return stats
 
-    def match(self, event: dict, type_: str = "streams", tag_field_name: str = "tags") -> List[dict] | List[None]:
+    def match(self, event: dict, type_: str = "streams", tag_field_name: str = "tags") -> List[Results] | List[None]:
         """
         Process a single event message and call the right stream match method.
 
@@ -44,7 +46,7 @@ class Routing:
             event["certego"] = {}
         if "routing_history" not in event["certego"]:
             event["certego"]["routing_history"] = {}
-        
+
         event_dictquery = DictQuery(event)
 
         # check stream
@@ -99,8 +101,11 @@ class Routing:
                         streams.add_rulemanager(rule_manager)
                     for rule in rule_file[stream_type]["rules"][tag]:
                         # add rule to rule manager and filters to rule
-                        output = rule["streams"] if rule["streams"] else {}
-                        rule_object = Rule(uid="uid", output=output)  # TODO: define uid
+                        output = rule["streams"] if "streams" in rule.keys() else None
+                        if "id" not in rule.keys():
+                            rule["id"] = str(uuid.uuid4())
+                        uid = rule["id"]
+                        rule_object = Rule(uid=uid, output=output)
                         rule_manager.add_rule(rule_object)
                         filter_list = self._get_filters(rule)
                         rule_object.add_filter(filter_list)
@@ -128,6 +133,8 @@ class Routing:
                     new_filter = filters.NotExistFilter(keys)
                 case "EQUALS":
                     new_filter = filters.EqualFilter(keys, values)
+                case "NOT_EQUALS":
+                    new_filter = filters.NotEqualFilter(keys, values)
                 case "STARTSWITH":
                     new_filter = filters.StartswithFilter(keys, values)
                 case "ENDSWITH":
