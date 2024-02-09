@@ -26,7 +26,7 @@ class Rule:
         :param event: event to check
         :type event: DictQuery
         :return: the output or no value
-        :rtype: dict | None
+        :rtype: Results | None
         """
         for f in self._filters:
             if not f.match(event):
@@ -110,7 +110,7 @@ class RuleManager:
         :param tag: routing tag
         :type tag: str
         :return: result of match or None
-        :rtype: dict | None
+        :rtype: Results | None
         """
         if tag != self.tag:
             return None

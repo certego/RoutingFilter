@@ -14,6 +14,7 @@ class Routing:
     def __init__(self):
         self.streams = Stream("streams")
         self.customer = Stream("customer")
+        self.variables = {}
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def get_stats(self, delete: bool = False) -> dict:
@@ -76,6 +77,8 @@ class Routing:
         :return: no value
         :rtype None
         """
+        if variables:
+            self.variables = variables
         # check rules_list
         if not isinstance(rules_list, list):
             self.logger.error(f"Invalid argument: {rules_list} is not a list.")
@@ -107,10 +110,10 @@ class Routing:
                         uid = rule["id"]
                         rule_object = Rule(uid=uid, output=output)
                         rule_manager.add_rule(rule_object)
-                        filter_list = self._get_filters(rule)
+                        filter_list = self._get_filters(rule, variables)
                         rule_object.add_filter(filter_list)
 
-    def _get_filters(self, rule: dict) -> List[filters.AbstractFilter]:
+    def _get_filters(self, rule: dict, variables: Optional[dict]) -> List[filters.AbstractFilter]:
         """
         Get filters by checking rule dictionary.
 
@@ -122,6 +125,8 @@ class Routing:
         filters_list = []
         for el in rule["filters"]:
             keys = el["key"] if "key" in el.keys() else None
+            if variables:  # substitute variables for each filter
+                el["value"] = self._substitute_variables(el["value"])
             values = el["value"] if "value" in el.keys() else None
             new_filter = None
             match el["type"]:
@@ -140,7 +145,7 @@ class Routing:
                 case "ENDSWITH":
                     new_filter = filters.EndswithFilter(keys, values)
                 case "KEYWORD":
-                    new_filter = filters.Keywordfilter(keys, values)
+                    new_filter = filters.KeywordFilter(keys, values)
                 case "REGEXP":
                     new_filter = filters.RegexpFilter(keys, values)
                 case "NETWORK":
@@ -157,6 +162,30 @@ class Routing:
             filters_list.append(new_filter)
         return filters_list
 
+    def _substitute_variables(self, values: str) -> List | str:
+        """
+        Map a variable name into its value, if defined in variables dictionary.
+
+        :param values: variable name
+        :type values: str
+        :return: list of variable value or, if not defined, the variable name
+        :rtype: list or str
+        """
+        variable_values = []
+        if not isinstance(values, list):
+            values = [values]
+        for value in values:
+            if value in self.variables:
+                if not isinstance(self.variables[value], list):
+                    self.variables[value] = [self.variables[value]]
+                variable_values.extend(self.variables[value])
+        if variable_values:
+            res = variable_values
+        else:
+            self.logger.warning(f"Variable {values} does not exist in variables dictionary.")
+            res = values
+        return res
+
     def load_from_jsons(self, rule_list: List[str], validate_rules: bool = True, variables: Optional[dict] = None) -> None:
         """
         Load routing rule configurations from json data.
@@ -170,7 +199,6 @@ class Routing:
         :return: no value
         :rtype: None
         """
-        # TODO: implement variables
         if not isinstance(rule_list, list):
             raise ValueError(f"Invalid rule_list {rule_list}: it must be a list of json data")
         try:

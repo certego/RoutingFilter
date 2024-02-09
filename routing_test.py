@@ -81,7 +81,7 @@ class RoutingTestCase(unittest.TestCase):
             if i in [0, 2, 3]:
                 self.assertIsInstance(rule._filters[0], filters.EqualFilter)
             elif i in [1, 4]:
-                self.assertIsInstance(rule._filters[0], filters.Keywordfilter)
+                self.assertIsInstance(rule._filters[0], filters.KeywordFilter)
             else:
                 self.assertIsInstance(rule._filters[0], filters.ExistFilter)
 
@@ -363,7 +363,7 @@ class RoutingTestCase(unittest.TestCase):
         # key doesn't exist
         self.assertFalse(self.routing.match(self.test_event_5))
 
-    # TODO: following 4 tests not work fine yet (variables)
+    # TODO: if error raise an exception
     def test_variables_no_list(self):
         self.routing.load_from_dicts([load_test_data("test_rule_23_network_variables")])
         self.assertFalse(self.routing.match(self.test_event_4))
@@ -381,19 +381,57 @@ class RoutingTestCase(unittest.TestCase):
         self.assertTrue(self.routing.match(self.test_event_4))
 
     def test_rule_in_routing_history(self):
-        event = {"certego": {"routing_history": {}}}
         rule = {
-            "filters": [{"type": "EQUALS", "key": "wheel_model", "description": "Carbon fiber wheels needs manual truing", "value": ["Superlight", "RacePro"]}],
-            "streams": {},
+            "streams": {
+                "rules": {
+                    "mountain_bike": [
+                        {
+                            "id": "equals-fbh49ry29",
+                            "filters": [
+                                {
+                                    "type": "EQUALS",
+                                    "key": "wheel_model",
+                                    "description": "Carbon fiber wheels needs manual truing",
+                                    "value": ["Superlight", "RacePro"],
+                                }
+                            ],
+                            "streams": {},
+                        }
+                    ]
+                }
+            }
         }
-        self.assertFalse(self.routing.rule_in_routing_history("streams", event, rule))
+
         event = {"certego": {"routing_history": {"Workshop": "2023-06-06T18:00:00.000Z"}}}
-        self.assertFalse(self.routing.rule_in_routing_history("streams", event, rule))
+
+        self.routing.load_from_dicts([rule])
+        # event not processed yet
+        self.routing.match(event)
+        self.assertDictEqual(event, {"certego": {"routing_history": {"Workshop": "2023-06-06T18:00:00.000Z"}}})
         rule = {
-            "filters": [{"type": "EQUALS", "key": "wheel_model", "description": "Carbon fiber wheels needs manual truing", "value": ["Superlight", "RacePro"]}],
-            "streams": {"Workshop": {"workers_needed": 1}},
+            "streams": {
+                "rules": {
+                    "mountain_bike": [
+                        {
+                            "id": "equals-fbh49ry29",
+                            "filters": [
+                                {
+                                    "type": "EQUALS",
+                                    "key": "wheel_model",
+                                    "description": "Carbon fiber wheels needs manual truing",
+                                    "value": ["Superlight", "RacePro"],
+                                }
+                            ],
+                            "streams": {"Workshop": {"workers_needed": 1}},
+                        }
+                    ]
+                }
+            }
         }
-        self.assertTrue(self.routing.rule_in_routing_history("streams", event, rule))
+        self.routing.load_from_dicts([rule])
+        # event already processed
+        self.routing.match(event)
+        self.assertDictEqual(event, {"certego": {"routing_history": {"Workshop": "2023-06-06T18:00:00.000Z"}}})
 
     def test_get_stats(self):
         rule_list = [

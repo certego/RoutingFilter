@@ -25,7 +25,7 @@ class Stream:
         :param tag_field_name: the event field to search into (default "tags")
         :type tag_field_name: str
         :return: list of matches or None otherwise
-        :rtype: List[dict] | List[None]
+        :rtype: List[Results]
         """
         match_list = []
         tags = event.get(tag_field_name, [])

@@ -20,6 +20,12 @@ class AbstractFilter(ABC):
         return NotImplemented
 
     def _check_value(self) -> Optional[Exception]:
+        """
+        Check if values in self._value are correct and raise an exception if they are incorrect.
+
+        :return: no value or raise an exception
+        :rtype: Optional[Exception]
+        """
         return None
 
 
@@ -179,7 +185,7 @@ class EndswithFilter(AbstractFilter):
         return False
 
 
-class Keywordfilter(AbstractFilter):
+class KeywordFilter(AbstractFilter):
     def match(self, event: DictQuery) -> bool:
         """
         Return True if at least one value is present in the event value of corresponding key.
@@ -264,20 +270,21 @@ class NetworkFilter(AbstractFilter):
 
     def _check_value(self) -> Optional[Exception]:
         """
-        Check if the values in self.value are valid IP addresses.
+        Check if the values in self._value are valid IP addresses.
 
         :return: none or error generated
         :rtype: Optional[Exception]
         """
+        # TODO: exception or not?
         for value in self._value:
             try:
                 value = IP(value)
             except ValueError as e:
                 self.logger.error(f"IP address (value error) error, during check of value {value} in list {self._value}. Error was: {e}.")
-                raise ValueError(f"IP address check failed: value error for value {value}.")
+                # raise ValueError(f"IP address check failed: value error for value {value}.")
             except TypeError as e:
                 self.logger.error(f"IP address (type error) error, during check of value {value} in list {self._value}. Error was: {e}.")
-                raise ValueError(f"IP address check failed: type error for value {value}.")
+                # raise ValueError(f"IP address check failed: type error for value {value}.")
         return None
 
     def match(self, event: DictQuery) -> bool:
@@ -335,7 +342,7 @@ class DomainFilter(AbstractFilter):
 
     def _check_value(self) -> Optional[Exception]:
         """
-        Check if values in self.value are string.
+        Check if values in self._value are string.
 
         :return: none or error generated
         :rtype: bool
@@ -384,7 +391,7 @@ class ComparatorFilter(AbstractFilter):
 
     def _check_value(self) -> Optional[Exception]:
         """
-        Check if values in self.value are float.
+        Check if values in self._value are float.
 
         :return: none or error generated
         :rtype: Optional[Exception]
