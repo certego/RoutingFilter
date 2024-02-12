@@ -275,16 +275,15 @@ class NetworkFilter(AbstractFilter):
         :return: none or error generated
         :rtype: Optional[Exception]
         """
-        # TODO: exception or not?
         for value in self._value:
             try:
                 value = IP(value)
             except ValueError as e:
                 self.logger.error(f"IP address (value error) error, during check of value {value} in list {self._value}. Error was: {e}.")
-                # raise ValueError(f"IP address check failed: value error for value {value}.")
+                raise ValueError(f"IP address check failed: value error for value {value}.")
             except TypeError as e:
                 self.logger.error(f"IP address (type error) error, during check of value {value} in list {self._value}. Error was: {e}.")
-                # raise ValueError(f"IP address check failed: type error for value {value}.")
+                raise ValueError(f"IP address check failed: type error for value {value}.")
         return None
 
     def match(self, event: DictQuery) -> bool:
@@ -446,7 +445,7 @@ class ComparatorFilter(AbstractFilter):
                 value = float(value)
             except ValueError as e:
                 self.logger.error(f"Error in parsing value to float in comparator filter: {e}. ")
-                raise ValueError(f"Error in parsing value to float, during checking {value} {self._comparator_type} than {term}.")
+                return False
             match self._comparator_type:
                 case "GREATER":
                     if value > term:

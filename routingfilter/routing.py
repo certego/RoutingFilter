@@ -108,10 +108,13 @@ class Routing:
                         if "id" not in rule.keys():
                             rule["id"] = str(uuid.uuid4())
                         uid = rule["id"]
-                        rule_object = Rule(uid=uid, output=output)
-                        rule_manager.add_rule(rule_object)
-                        filter_list = self._get_filters(rule, variables)
-                        rule_object.add_filter(filter_list)
+                        try:
+                            filter_list = self._get_filters(rule, variables)
+                            rule_object = Rule(uid=uid, output=output)
+                            rule_manager.add_rule(rule_object)
+                            rule_object.add_filter(filter_list)
+                        except Exception as e:
+                            self.logger.error(f"Error during creating filter list. Impossible to create Rule {uid} with output: {output}. The error was '{e}'")
 
     def _get_filters(self, rule: dict, variables: Optional[dict]) -> List[filters.AbstractFilter]:
         """

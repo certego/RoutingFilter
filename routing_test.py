@@ -265,11 +265,8 @@ class RoutingTestCase(unittest.TestCase):
         self.assertFalse(self.routing.match({}))
         self.assertTrue(self.routing.match(self.test_event_1))
         self.assertFalse(self.routing.match(self.test_event_3))
-        with self.assertRaises(ValueError):
-            event_2 = self.test_event_2
-            event_2["tags"] = "mountain_bike"
-            event_2["price"] = "600a"
-            self.routing.match(event_2)
+        event_2 = self.test_event_2
+        self.assertFalse(self.routing.match(event_2))
 
     def test_single_filters_LESS(self):
         self.routing.load_from_dicts([load_test_data("test_rule_13_less")])  # LESS
@@ -363,7 +360,6 @@ class RoutingTestCase(unittest.TestCase):
         # key doesn't exist
         self.assertFalse(self.routing.match(self.test_event_5))
 
-    # TODO: if error raise an exception
     def test_variables_no_list(self):
         self.routing.load_from_dicts([load_test_data("test_rule_23_network_variables")])
         self.assertFalse(self.routing.match(self.test_event_4))

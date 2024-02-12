@@ -3,6 +3,7 @@
       "rules": {
         "ip_traffic": [
           {
+            "uid": "variables-abc123",
             "filters": [
               {
                 "type": "NETWORK",
