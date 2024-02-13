@@ -1,3 +1,8 @@
+## 2.0.x
+### 2.0.0
+#### Changes
+* Refactoring of Routing Filter Class (object-oriented)
+
 ## 1.6.x
 ### 1.6.3
 #### Bugfix

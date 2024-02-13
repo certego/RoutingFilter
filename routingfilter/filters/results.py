@@ -1,8 +1,11 @@
-import logging
+from dataclasses import dataclass
 
 
+@dataclass
 class Results:
+    rules: str
+    output: dict
+
     def __init__(self, rules, output):
         self.rules = rules
         self.output = output
-        self.logger = logging.getLogger(self.__class__.__name__)
