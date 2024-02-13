@@ -71,4 +71,3 @@ jobs:
       run: |
         source ../venv/bin/activate
         pytest routing_test.py
-      working-directory: ./routingfilter
