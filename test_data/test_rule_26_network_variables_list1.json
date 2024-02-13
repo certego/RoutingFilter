@@ -15,6 +15,20 @@
                 "workers_needed": 1
               }
             }
+          },
+          {
+            "filters": [
+              {
+                "type": "NETWORK",
+                "key": "src_addr",
+                "value": ["10.10.10.10"]
+              }
+            ],
+            "streams": {
+              "Workshop": {
+                "workers_needed": 1
+              }
+            }
           }
         ]
       }

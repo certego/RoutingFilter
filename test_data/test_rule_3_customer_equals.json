@@ -3,6 +3,7 @@
     "rules": {
       "all": [
         {
+          "id": "customer-dh8rh9fow",
           "filters": [
             {
               "type": "EQUALS",

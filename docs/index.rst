@@ -67,7 +67,7 @@ Available filters
 For filter types which use "key" and "value" field, they can be both a string or a list of strings.
 The chosen logic is OR (at least a match must be satisfied).
 
-* **ALL** - matches with everithing, always returns True (if this matches, all other rules are ignored)
+* **ALL** - matches with everything, always returns True (if this matches, all other rules are ignored)
 * **EXISTS** - returns True if the key in "key" field exists
 * **NOT_EXISTS** - returns False if the key in "key" field exists
 * **EQUALS** - returns True if the value in the specified "key" is equal to "value"
@@ -128,22 +128,13 @@ We create the following rule: ::
      }
    }
 
-If we apply this rule to `test_event_n1`, it will match, since the `src_addr` is in the subnet `192.168.1.0/24`. We are obtaining the following output: ::
+If we apply this rule to `test_event_n1`, it will match, since the `src_addr` is in the subnet `192.168.1.0/24`. We are obtaining an object `Results` with attribute `rules`, which indicates the rule ID, and attribute `output`, that in this case is: ::
 
-   {
-     "rules": [
-       {
-         "type": "NETWORK",
-         "key": "src_addr",
-         "value": "192.168.1.0/24"
-       }
-     ],
-     "output": {
-       "filtered": False
-     }
-   }
+  {
+    "filtered": False
+  }
 
-The second event will not match with rule `test_event_n1`, since the `src_addr` is not in the subnet `192.168.1.0/24`. The function will return an empty dictionary.
+The second event will not match with rule `test_event_n1`, since the `src_addr` is not in the subnet `192.168.1.0/24`. The function will return an object `Results` with output value equals to `None`.
 
 Routing
 ==================

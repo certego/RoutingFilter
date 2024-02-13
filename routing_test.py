@@ -3,6 +3,7 @@ import json
 import os
 import unittest
 
+from routingfilter.filters import filters
 from routingfilter.routing import Routing
 
 
@@ -41,51 +42,73 @@ class RoutingTestCase(unittest.TestCase):
         self.test_event_with_list_1 = load_test_data("test_event_with_list_1")
         self.test_event_with_list_2 = load_test_data("test_event_with_list_2")
 
-    def test_wrong_inputs(self):
-        self.assertIsNone(self.routing.get_rules())
-        with self.assertRaises(ValueError):
-            self.routing.match({})
-        self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
-        self.assertEqual(self.routing.match(self.test_event_1, "wrong_type"), [])
-        self.assertEqual(self.routing.match({}), [])
-        self.routing.load_from_dicts([])
-        self.assertDictEqual(self.routing.get_rules(), {})
-        with self.assertRaises(ValueError):
-            self.routing.load_from_jsons([])
-
     def test_multiple_rule_loading(self):
-        data = load_test_data("test_rule_1_equals")
-        rule_list_duplicate = [
-            load_test_data("test_rule_11_domain"),
-            data,
-            load_test_data("test_rule_11_domain"),
-            data,
+        # rule to duplicate
+        one_rule = load_test_data("test_rule_30_big_rule_file")
+        # load more rules
+        rule_list = [
+            one_rule,
+            load_test_data("test_rule_1_equals"),
+            load_test_data("test_rule_3_customer_equals"),
+            one_rule,
             load_test_data("test_rule_5_exists"),
         ]
-        self.routing.load_from_dicts(rule_list_duplicate)
-        self.assertEqual(len(self.routing.get_rules()["streams"]["rules"]["mountain_bike"]), 3)
-        self.assertEqual(len(self.routing.get_rules()["streams"]["rules"]["ip_traffic"]), 2)
-        # Verify that the only first rule matches
-        rule_all = load_test_data("test_rule_2_all_equals")
-        filter_2 = copy.deepcopy(rule_all["streams"]["rules"]["all"][0])
-        filter_2["streams"] = {"Other": None}
-        rule_all["streams"]["rules"]["all"].append(filter_2)
-        self.routing.load_from_dicts([rule_all])
-        self.assertDictEqual(self.routing.match(self.test_event_1)[0]["output"], {"Workshop": {"workers_needed": 1}})
+        self.routing.load_from_dicts(rule_list)
+
+        # check if all objects are correctly instantiated
+        stream_rule_managers = self.routing.streams._ruleManagers
+        customer_rule_managers = self.routing.customer._ruleManagers
+        self.assertEqual(len(stream_rule_managers.keys()), 2)
+        self.assertEqual(len(customer_rule_managers.keys()), 1)
+
+        for tag in ["mountain_bike", "city_bike"]:
+            self.assertIn(tag, stream_rule_managers.keys())
+        self.assertIn("all", customer_rule_managers.keys())
+        self.assertEqual(len(stream_rule_managers), 2)
+        self.assertEqual(len(customer_rule_managers), 1)
+        rule_mountain_bike = stream_rule_managers["mountain_bike"]._rules
+        rule_city_bike = stream_rule_managers["city_bike"]._rules
+        self.assertEqual(len(rule_mountain_bike), 6)
+        self.assertEqual(len(rule_city_bike), 2)
+
+        customer_rule_all = customer_rule_managers["all"]._rules
+        self.assertEqual(len(customer_rule_all), 1)
+
+        # verify filters
+        for i, rule in enumerate(rule_mountain_bike):
+            self.assertEqual(len(rule._filters), 1)
+            # check they are sorted in correct way
+            if i in [0, 2, 3]:
+                self.assertIsInstance(rule._filters[0], filters.EqualFilter)
+            elif i in [1, 4]:
+                self.assertIsInstance(rule._filters[0], filters.KeywordFilter)
+            else:
+                self.assertIsInstance(rule._filters[0], filters.ExistFilter)
+
+        for rule in rule_city_bike:
+            self.assertEqual(len(rule._filters), 1)
+            self.assertIsInstance(rule._filters[0], filters.EqualFilter)
+
+        for rule in customer_rule_all:
+            self.assertEqual(len(rule._filters), 1)
+            self.assertIsInstance(rule._filters[0], filters.EqualFilter)
+
+        self.assertIsInstance(customer_rule_all[0]._filters[0], filters.EqualFilter)
+        # check output of match method
+        self.assertEqual(self.routing.match(self.test_event_1)[0].output, None)
 
     def test_match_streams_none(self):
         self.routing.load_from_dicts([load_test_data("test_rule_25_routing_history_streams_none")])
         self.routing.match(self.test_event_1)
-        self.assertTrue("rules" in self.routing.match(self.test_event_1)[0])
-        self.assertTrue("output" in self.routing.match(self.test_event_1)[0])
-        self.assertEqual(None, self.routing.match(self.test_event_1)[0]["output"])
+        self.assertTrue(self.routing.match(self.test_event_1)[0].rules)
+        self.assertTrue(hasattr(self.routing.match(self.test_event_1)[0], "output"))
+        self.assertEqual(None, self.routing.match(self.test_event_1)[0].output)
 
     def test_no_match_streams_none(self):
         self.routing.load_from_dicts([load_test_data("test_rule_25_routing_history_streams_none")])
         self.routing.match(self.test_event_4)
-        self.assertFalse("rules" in self.routing.match(self.test_event_4))
+        self.assertFalse(self.routing.match(self.test_event_4))
         self.assertEqual([], self.routing.match(self.test_event_4))
-        self.assertFalse("output" in self.routing.match(self.test_event_4))
 
     def test_routing_history(self):
         self.routing.load_from_dicts([load_test_data("test_rule_24_routing_history")])
@@ -108,7 +131,7 @@ class RoutingTestCase(unittest.TestCase):
         self.routing.match(self.test_event_1)
         # Checking no match, the message should be filtered
         self.assertEqual(len(self.test_event_1["certego"]["routing_history"].keys()), 1)
-        self.assertEqual(None, self.routing.match(self.test_event_1)[0]["output"])
+        self.assertEqual(None, self.routing.match(self.test_event_1)[0].output)
 
     def test_routing_history_same_rule_twice(self):
         workshop_count = 0
@@ -126,10 +149,10 @@ class RoutingTestCase(unittest.TestCase):
     def test_double_stream(self):
         self.routing.load_from_dicts([load_test_data("test_rule_28_double_stream")])
         res = self.routing.match(self.test_event_1)
-        self.assertDictEqual({"Workshop": {"workers_needed": 1}, "Lab": {"workers_needed": 2}}, res[0]["output"])
+        self.assertDictEqual({"Workshop": {"workers_needed": 1}, "Lab": {"workers_needed": 2}}, res[0].output)
         self.assertTrue("Workshop" in self.test_event_1["certego"]["routing_history"])
         self.assertTrue("Lab" in self.test_event_1["certego"]["routing_history"])
-        self.assertEqual(2, len(res[0]["output"]))
+        self.assertEqual(2, len(res[0].output))
 
     def test_double_tag(self):
         self.routing.load_from_dicts([load_test_data("test_rule_29_double_tag")])
@@ -139,41 +162,39 @@ class RoutingTestCase(unittest.TestCase):
     def test_rule_1(self):
         # Test rule loading and applying with full output
         self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
-        self.assertDictEqual(self.routing.match(self.test_event_1)[0], load_test_data("test_event_1_rule_1_response"))
+        result = self.routing.match(self.test_event_1)[0]
+        self.assertDictEqual(result.output, load_test_data("test_event_1_rule_1_response")["output"])
+        self.assertEqual(result.rules, load_test_data("test_event_1_rule_1_response")["id"])
         self.assertEqual(self.routing.match(self.test_event_2), [])
         self.assertEqual(self.routing.match(self.test_event_3), [])
 
     def test_rule_2(self):
         # Same as test_rule_1, but with type "all" (matches all "types")
         self.routing.load_from_dicts([load_test_data("test_rule_2_all_equals")])
-        self.assertDictEqual(self.routing.match(self.test_event_1)[0], load_test_data("test_event_1_rule_1_response"))
-        self.assertDictEqual(self.routing.match(self.test_event_2)[0], load_test_data("test_event_1_rule_1_response"))
+        result1 = self.routing.match(self.test_event_1)[0]
+        self.assertDictEqual(result1.output, load_test_data("test_event_1_rule_1_response")["output"])
+        self.assertEqual(result1.rules, load_test_data("test_event_1_rule_1_response")["id"])
+        result2 = self.routing.match(self.test_event_2)[0]
+        self.assertDictEqual(result2.output, load_test_data("test_event_1_rule_1_response")["output"])
+        self.assertEqual(result2.rules, load_test_data("test_event_1_rule_1_response")["id"])
         self.assertEqual(self.routing.match(self.test_event_3), [])
 
     def test_rule_4(self):
         # Rule 4 contains more than one filter in one rule
         self.routing.load_from_dicts([load_test_data("test_rule_4_multiple_filters")])
-        self.assertDictEqual(self.routing.match(self.test_event_1)[0], load_test_data("test_event_1_rule_4_response"))
+        result = self.routing.match(self.test_event_1)[0]
+        self.assertDictEqual(result.output, load_test_data("test_event_1_rule_4_response")["output"])
+        self.assertEqual(result.rules, load_test_data("test_event_1_rule_4_response")["id"])
         self.assertEqual(self.routing.match(self.test_event_2), [])
         self.assertEqual(self.routing.match(self.test_event_3), [])
-
-    def test_merged_rules(self):
-        # Merge two rules with same "type". Fully tests the method "load_from_dicts"
-        test_rule_1_equals = load_test_data("test_rule_1_equals")
-        self.routing.load_from_dicts([test_rule_1_equals, load_test_data("test_rule_2_all_equals")])
-        self.assertDictEqual(self.routing.get_rules(), load_test_data("merge_rules_1_2"))
-        self.routing.load_from_dicts([test_rule_1_equals, load_test_data("test_rule_3_customer_equals")])
-        self.assertDictEqual(self.routing.get_rules(), load_test_data("merge_rules_1_3"))
-        self.routing.load_from_dicts([test_rule_1_equals, load_test_data("test_rule_4_multiple_filters")])
-        self.assertDictEqual(self.routing.get_rules(), load_test_data("merge_rules_1_4"))
 
     def test_special_tag_all(self):
         # Test merge with special tag 'all' (matches all tags)
         test_rule_1_equals = load_test_data("test_rule_1_equals")
         test_rule_2_all_equals = load_test_data("test_rule_2_all_equals")
         self.routing.load_from_dicts([test_rule_1_equals, test_rule_2_all_equals])
-        self.assertDictEqual(self.routing.match(self.test_event_1)[0], load_test_data("test_event_1_rule_1_response"))
-        self.assertDictEqual(self.routing.match(self.test_event_2)[0], load_test_data("test_event_1_rule_1_response"))
+        self.assertDictEqual(self.routing.match(self.test_event_1)[0].output, load_test_data("test_event_1_rule_1_response")["output"])
+        self.assertDictEqual(self.routing.match(self.test_event_2)[0].output, load_test_data("test_event_1_rule_1_response")["output"])
         self.assertEqual(self.routing.match(self.test_event_3), [])
 
     def test_special_tag_all2(self):
@@ -181,7 +202,7 @@ class RoutingTestCase(unittest.TestCase):
         test_rule_2_all_equals = load_test_data("test_rule_2_all_equals")
         test_rule_2_all_equals["streams"]["rules"]["all"][0]["filters"][0]["key"] = "wheel_model_wrong"
         self.routing.load_from_dicts([test_rule_1_equals, test_rule_2_all_equals])
-        self.assertDictEqual(self.routing.match(self.test_event_1)[0], load_test_data("test_event_1_rule_1_response"))
+        self.assertDictEqual(self.routing.match(self.test_event_1)[0].output, load_test_data("test_event_1_rule_1_response")["output"])
         self.assertEqual(self.routing.match(load_test_data("test_event_2")), [])
 
     def test_event_with_multiple_tags(self):
@@ -189,7 +210,7 @@ class RoutingTestCase(unittest.TestCase):
         test_rule_9_network = load_test_data("test_rule_9_network")
         test_rule_9_network["streams"]["rules"]["ip_traffic"][0]["streams"] = {"metatada": 123}
         self.routing.load_from_dicts([test_rule_1_equals])
-        self.assertDictEqual(self.routing.match(self.test_event_6)[0], load_test_data("test_event_1_rule_1_response"))
+        self.assertDictEqual(self.routing.match(self.test_event_6)[0].output, load_test_data("test_event_1_rule_1_response")["output"])
         self.assertFalse(self.routing.match(self.test_event_2))
         self.routing.load_from_dicts([test_rule_1_equals, test_rule_9_network])
         test_event_4_mod = copy.deepcopy(self.test_event_4)
@@ -244,11 +265,8 @@ class RoutingTestCase(unittest.TestCase):
         self.assertFalse(self.routing.match({}))
         self.assertTrue(self.routing.match(self.test_event_1))
         self.assertFalse(self.routing.match(self.test_event_3))
-        with self.assertRaises(ValueError):
-            event_2 = self.test_event_2
-            event_2["tags"] = "mountain_bike"
-            event_2["price"] = "600a"
-            self.routing.match(event_2)
+        event_2 = self.test_event_2
+        self.assertFalse(self.routing.match(event_2))
 
     def test_single_filters_LESS(self):
         self.routing.load_from_dicts([load_test_data("test_rule_13_less")])  # LESS
@@ -300,7 +318,7 @@ class RoutingTestCase(unittest.TestCase):
         self.assertTrue(self.routing.match(self.test_event_8))  # value: "str"
         self.assertTrue(self.routing.match(self.test_event_11))  # value: "int"
         self.assertTrue(self.routing.match(self.test_event_13))  # value: "dict"
-        self.assertFalse(self.routing.match(self.test_event_12))
+        self.assertFalse(self.routing.match(self.test_event_12))  # value: "bool"
 
     def test_single_filter_TYPEOF_str(self):
         self.routing.load_from_dicts([load_test_data("test_rule_16_typeof_str")])  # is_str
@@ -359,16 +377,85 @@ class RoutingTestCase(unittest.TestCase):
         self.assertTrue(self.routing.match(self.test_event_4))
 
     def test_rule_in_routing_history(self):
-        event = {"certego": {"routing_history": {}}}
         rule = {
-            "filters": [{"type": "EQUALS", "key": "wheel_model", "description": "Carbon fiber wheels needs manual truing", "value": ["Superlight", "RacePro"]}],
-            "streams": {},
+            "streams": {
+                "rules": {
+                    "mountain_bike": [
+                        {
+                            "id": "equals-fbh49ry29",
+                            "filters": [
+                                {
+                                    "type": "EQUALS",
+                                    "key": "wheel_model",
+                                    "description": "Carbon fiber wheels needs manual truing",
+                                    "value": ["Superlight", "RacePro"],
+                                }
+                            ],
+                            "streams": {},
+                        }
+                    ]
+                }
+            }
         }
-        self.assertFalse(self.routing.rule_in_routing_history("streams", event, rule))
+
         event = {"certego": {"routing_history": {"Workshop": "2023-06-06T18:00:00.000Z"}}}
-        self.assertFalse(self.routing.rule_in_routing_history("streams", event, rule))
+
+        self.routing.load_from_dicts([rule])
+        # event not processed yet
+        self.routing.match(event)
+        self.assertDictEqual(event, {"certego": {"routing_history": {"Workshop": "2023-06-06T18:00:00.000Z"}}})
         rule = {
-            "filters": [{"type": "EQUALS", "key": "wheel_model", "description": "Carbon fiber wheels needs manual truing", "value": ["Superlight", "RacePro"]}],
-            "streams": {"Workshop": {"workers_needed": 1}},
+            "streams": {
+                "rules": {
+                    "mountain_bike": [
+                        {
+                            "id": "equals-fbh49ry29",
+                            "filters": [
+                                {
+                                    "type": "EQUALS",
+                                    "key": "wheel_model",
+                                    "description": "Carbon fiber wheels needs manual truing",
+                                    "value": ["Superlight", "RacePro"],
+                                }
+                            ],
+                            "streams": {"Workshop": {"workers_needed": 1}},
+                        }
+                    ]
+                }
+            }
         }
-        self.assertTrue(self.routing.rule_in_routing_history("streams", event, rule))
+        self.routing.load_from_dicts([rule])
+        # event already processed
+        self.routing.match(event)
+        self.assertDictEqual(event, {"certego": {"routing_history": {"Workshop": "2023-06-06T18:00:00.000Z"}}})
+
+    def test_get_stats(self):
+        rule_list = [
+            load_test_data("test_rule_1_equals"),
+            load_test_data("test_rule_3_customer_equals"),
+            load_test_data("test_rule_5_exists"),
+        ]
+        self.routing.load_from_dicts(rule_list)
+        self.routing.match(self.test_event_3)
+        expected_stats = {"streams": {"exists-fh0wery": {}, "equals-fbh49ry29": {}}, "customer": {"customer-dh8rh9fow": {}}}
+        self.assertDictEqual(self.routing.get_stats(), expected_stats)
+
+        # equals match
+        self.routing.match(self.test_event_1)
+        expected_stats["streams"]["equals-fbh49ry29"].update({"unknown": 1})
+        self.assertDictEqual(self.routing.get_stats(), expected_stats)
+
+        # exists match
+        self.routing.match(self.test_event_8)
+        expected_stats["streams"]["exists-fh0wery"].update({"unknown": 1})
+        self.assertDictEqual(self.routing.get_stats(), expected_stats)
+
+        # equals match and delete
+        self.routing.match(self.test_event_10)
+        expected_stats["streams"]["equals-fbh49ry29"].update({"unknown": 2})
+        self.assertDictEqual(self.routing.get_stats(delete=True), expected_stats)
+        self.assertDictEqual(self.routing.get_stats(), {"streams": {"exists-fh0wery": {}, "equals-fbh49ry29": {}}, "customer": {"customer-dh8rh9fow": {}}})
+
+
+if __name__ == "__main__":
+    unittest.main()

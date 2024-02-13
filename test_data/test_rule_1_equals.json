@@ -3,6 +3,7 @@
     "rules": {
       "mountain_bike": [
         {
+          "id": "equals-fbh49ry29",
           "filters": [
             {
               "type": "EQUALS",
