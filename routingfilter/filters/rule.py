@@ -100,6 +100,15 @@ class RuleManager:
         self._rules = []
         self.logger = logging.getLogger(self.__class__.__name__)
 
+    def count(self) -> int:
+        """
+        Return the number of rules.
+
+        :return: number of rules
+        :rtype: int
+        """
+        return len(self._rules)
+
     def match(self, event: DictQuery, tag: str) -> Results | None:
         """
         Call all match methods of the Rules and return the result of first match.

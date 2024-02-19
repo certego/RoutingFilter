@@ -13,6 +13,18 @@ class Stream:
         self._ruleManagers = {}
         self.logger = logging.getLogger(self.__class__.__name__)
 
+    def count(self) -> int:
+        """
+        Returns the number of rules in the stream.
+
+        :return: number of rules
+        :rtype: int
+        """
+        count_rules = 0
+        for key in self._ruleManagers.keys():
+            count_rules += self._ruleManagers[key].count()
+        return count_rules
+
     def match(self, event: DictQuery, tag_field_name: str) -> List[Results]:
         """
         Call all ruleManagers that contain tha tag of event "tags" field (that could be a list).
