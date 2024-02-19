@@ -456,6 +456,17 @@ class RoutingTestCase(unittest.TestCase):
         self.assertDictEqual(self.routing.get_stats(delete=True), expected_stats)
         self.assertDictEqual(self.routing.get_stats(), {"streams": {"exists-fh0wery": {}, "equals-fbh49ry29": {}}, "customer": {"customer-dh8rh9fow": {}}})
 
+    def test_count(self):
+        rule_list = [
+            load_test_data("test_rule_1_equals"),
+            load_test_data("test_rule_3_customer_equals"),
+            load_test_data("test_rule_4_multiple_filters"),
+            load_test_data("test_rule_5_exists"),
+            load_test_data("test_rule_6_not_exists"),
+        ]
+        self.routing.load_from_dicts(rule_list)
+        self.assertEqual(self.routing.count(), 5)
+
 
 if __name__ == "__main__":
     unittest.main()

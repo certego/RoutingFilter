@@ -1,3 +1,8 @@
+## 2.1.x
+### 2.1.0
+#### Features
+* Added count method in Routing
+
 ## 2.0.x
 ### 2.0.0
 #### Changes

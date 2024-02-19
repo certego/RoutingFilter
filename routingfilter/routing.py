@@ -17,6 +17,17 @@ class Routing:
         self.variables = {}
         self.logger = logging.getLogger(self.__class__.__name__)
 
+    def count(self) -> int:
+        """
+        Return the number of the rules.
+
+        :return: number of the rules
+        :rtype: int
+        """
+        streams_count = self.streams.count()
+        customer_count = self.customer.count()
+        return streams_count + customer_count
+
     def get_stats(self, delete: bool = False) -> dict:
         """
         Call get_stats of streams and return the stats. If delete is True, reset the stats.
