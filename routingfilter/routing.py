@@ -40,7 +40,7 @@ class Routing:
         stats = {"streams": self.streams.get_stats(delete), "customer": self.customer.get_stats(delete)}
         return stats
 
-    def match(self, event: dict, type_: str = "streams", tag_field_name: str = "tags") -> List[Results] | List[None]:
+    def match(self, event: dict, type_: str = "streams", tag_field_name: str = "tags") -> List[Results]:
         """
         Process a single event message and call the right stream match method.
 
@@ -51,7 +51,7 @@ class Routing:
         :param tag_field_name: the event field to search into
         :type tag_field_name: str
         :return: A list of dictionaries containing the matched rules and the outputs
-        :rtype: List[dict]
+        :rtype: List[Results]
         """
         # create routing_history if not exists
         if "certego" not in event.keys():

@@ -1,12 +1,12 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 
 with open("README.md", "r") as readme_file:
     long_description = readme_file.read()
 
 setup(
     name="routingfilter",
-    version="2.1.0",
-    packages=["routingfilter"],
+    version="2.2.0",
+    packages=find_packages(include=["routingfilter", "routingfilter.*"]),
     include_package_data=True,
     install_requires=["IPy~=1.1", "macaddress~=2.0.2"],
     url="https://github.com/certego/RoutingFilter",
