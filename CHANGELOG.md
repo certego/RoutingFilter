@@ -1,4 +1,7 @@
 ## 2.2.x
+### 2.2.1
+#### Bugfix
+* Fixed bug in *match()* method of *Routing* class
 ### 2.2.0
 #### Features
 * Added *to_dict()* method to Results class
