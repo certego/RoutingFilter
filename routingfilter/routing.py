@@ -64,7 +64,7 @@ class Routing:
         # check stream
         if type_ == "streams":
             stream = self.streams
-        elif type_ == "customer":
+        elif type_ == "customers":
             stream = self.customer
         else:
             self.logger.error(f"Error during matching. Invalid Stream: {type_}")
