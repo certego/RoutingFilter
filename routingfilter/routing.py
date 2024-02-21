@@ -100,7 +100,7 @@ class Routing:
                 # check stream
                 if stream_type == "streams":
                     streams = self.streams
-                elif stream_type == "customer":
+                elif stream_type == "customers":
                     streams = self.customer
                 else:
                     self.logger.error(f"Error during loading rule. Invalid Stream: {stream_type}")
@@ -115,7 +115,7 @@ class Routing:
                         streams.add_rulemanager(rule_manager)
                     for rule in rule_file[stream_type]["rules"][tag]:
                         # add rule to rule manager and filters to rule
-                        output = rule["streams"] if "streams" in rule.keys() else None
+                        output = rule[stream_type] if stream_type in rule.keys() else None
                         if "id" not in rule.keys():
                             rule["id"] = str(uuid.uuid4())
                         uid = rule["id"]
