@@ -1,5 +1,5 @@
 {
-  "customer": {
+  "customers": {
     "rules": {
       "all": [
         {
@@ -15,7 +15,7 @@
               ]
             }
           ],
-          "streams": {
+          "customer": {
             "Workshop": {
               "workers_needed": 1
             }

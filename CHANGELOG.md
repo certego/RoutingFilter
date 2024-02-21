@@ -1,4 +1,9 @@
 ## 2.2.x
+### 2.2.2
+#### Bugfix
+* Fixed result output
+* Fixed customer stream type
+* Fixed equal filter
 ### 2.2.1
 #### Bugfix
 * Fixed bug in *match()* method of *Routing* class

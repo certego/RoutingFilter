@@ -94,13 +94,13 @@ class EqualFilter(AbstractFilter):
         """
         filter_value = []
         for value in self._value:
-            value = value.lower() if isinstance(value, str) else value
+            value = value.lower() if isinstance(value, str) else str(value)
             filter_value.append(value)
         for key in self._key:
             event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for value in event_value:
-                value = value.lower() if isinstance(value, str) else value
+                value = value.lower() if isinstance(value, str) else str(value)
                 if value in filter_value:
                     return True
         return False
