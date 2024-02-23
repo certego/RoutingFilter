@@ -13,7 +13,7 @@ from .filters.stream import Stream
 class Routing:
     def __init__(self):
         self.streams = Stream("streams")
-        self.customer = Stream("customer")
+        self.customer = Stream("customers")
         self.variables = {}
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -32,12 +32,27 @@ class Routing:
         """
         Call get_stats of streams and return the stats. If delete is True, reset the stats.
 
+        Return value example
+        ::
+
+            {
+                "streams": {
+                    "82347eur899yr": {
+                        "event_id_1": 1,
+                        "event_id_2": 3
+                    }
+                },
+                "customers": {
+                    "fg8234t7r88": {"event_id_3": 1}
+                }
+            }
+
         :param delete: If True, delete the stats
         :type delete: bool
         :return: stream and customer stats
         :rtype: dict
         """
-        stats = {"streams": self.streams.get_stats(delete), "customer": self.customer.get_stats(delete)}
+        stats = {"streams": self.streams.get_stats(delete), "customers": self.customer.get_stats(delete)}
         return stats
 
     def match(self, event: dict, type_: str = "streams", tag_field_name: str = "tags") -> List[Results]:
@@ -125,7 +140,9 @@ class Routing:
                             rule_manager.add_rule(rule_object)
                             rule_object.add_filter(filter_list)
                         except Exception as e:
-                            self.logger.error(f"Error during creating filter list. Impossible to create Rule {uid} with output: {output}. The error was '{e}'")
+                            self.logger.error(
+                                f"Error during creating filter list. Impossible to create Rule {uid} with output: {output}. The error was '{e}'. The entire rule is {rule}."
+                            )
 
     def _get_filters(self, rule: dict, variables: Optional[dict]) -> List[filters.AbstractFilter]:
         """

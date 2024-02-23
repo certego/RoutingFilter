@@ -75,7 +75,7 @@ class Rule:
         :return: all stats
         :rtype: dict
         """
-        stats = {self.uid: self._stats}
+        stats = {str(self.uid): self._stats}
         if delete:
             self._stats = {}
         return stats

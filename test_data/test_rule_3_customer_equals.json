@@ -15,7 +15,7 @@
               ]
             }
           ],
-          "customer": {
+          "customers": {
             "Workshop": {
               "workers_needed": 1
             }
