@@ -437,7 +437,7 @@ class RoutingTestCase(unittest.TestCase):
         ]
         self.routing.load_from_dicts(rule_list)
         self.routing.match(self.test_event_3)
-        expected_stats = {"streams": {"exists-fh0wery": {}, "equals-fbh49ry29": {}}, "customer": {"customer-dh8rh9fow": {}}}
+        expected_stats = {"streams": {"exists-fh0wery": {}, "equals-fbh49ry29": {}}, "customers": {"customer-dh8rh9fow": {}}}
         self.assertDictEqual(self.routing.get_stats(), expected_stats)
 
         # equals match
@@ -454,7 +454,7 @@ class RoutingTestCase(unittest.TestCase):
         self.routing.match(self.test_event_10)
         expected_stats["streams"]["equals-fbh49ry29"].update({"unknown": 2})
         self.assertDictEqual(self.routing.get_stats(delete=True), expected_stats)
-        self.assertDictEqual(self.routing.get_stats(), {"streams": {"exists-fh0wery": {}, "equals-fbh49ry29": {}}, "customer": {"customer-dh8rh9fow": {}}})
+        self.assertDictEqual(self.routing.get_stats(), {"streams": {"exists-fh0wery": {}, "equals-fbh49ry29": {}}, "customers": {"customer-dh8rh9fow": {}}})
 
     def test_count(self):
         rule_list = [

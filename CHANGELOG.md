@@ -1,4 +1,7 @@
 ## 2.2.x
+### 2.2.3
+#### Bugfix
+* Fixed rule get_stats 
 ### 2.2.2
 #### Bugfix
 * Fixed result output
