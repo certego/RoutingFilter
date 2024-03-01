@@ -213,7 +213,6 @@ class Routing:
         if variable_values:
             res = variable_values
         else:
-            self.logger.warning(f"Variable {values} does not exist in variables dictionary.")
             res = values
         return res
 

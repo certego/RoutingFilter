@@ -1,4 +1,7 @@
 ## 2.2.x
+### 2.2.4
+#### Bugfix
+* Removed warning logging in *\_substitute_variables*
 ### 2.2.3
 #### Bugfix
 * Fixed rule get_stats 
