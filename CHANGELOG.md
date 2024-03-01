@@ -1,4 +1,7 @@
 ## 2.2.x
+### 2.2.5
+#### Bugfix
+* Fixed version in *setup.py*
 ### 2.2.4
 #### Bugfix
 * Removed warning logging in *\_substitute_variables*
