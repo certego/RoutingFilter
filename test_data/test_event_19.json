@@ -1,0 +1,36 @@
+{
+  "tags": [
+    "elastic_query",
+    "foobar"
+  ],
+  "user": {
+    "name": "mario.rossi"
+  },
+  "event": {
+    "kind": "event",
+    "type": "start",
+    "action": "login",
+    "outcome": "success",
+    "category": "authentication"
+  },
+  "radius": {
+    "ttl": 17.044188022613525,
+    "result": "success"
+  },
+  "source": {
+    "ip": "1.1.1.1",
+    "port": 10402
+  },
+  "network": {
+    "protocol": "radius"
+  },
+  "severity": 3,
+  "reply_msg": "Enter your SecurID OTP or select another method: 1 to Approve on your registered authenticator, 2 for Biometrics"
+}
+
+
+
+
+
+
+

@@ -61,7 +61,7 @@ class ExistFilter(AbstractFilter):
         :rtype: bool
         """
         for key in self._key:
-            if key in event.keys():
+            if event.get(key) is not None:
                 return True
         return False
 

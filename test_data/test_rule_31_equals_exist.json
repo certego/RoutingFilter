@@ -1,0 +1,37 @@
+{
+  "streams": {
+    "rules": {
+      "elastic_query": [
+        {
+          "id": "equals-ffh498",
+          "filters": [
+            {
+              "id": 5540,
+              "key": [
+                "tags"
+              ],
+              "type": "EQUALS",
+              "value": [
+                "bar",
+                "foobar"
+              ]
+            },
+            {
+              "id": 6001,
+              "key": [
+                "source.ip"
+              ],
+              "type": "EXISTS",
+              "value": []
+            }
+          ],
+          "streams": {
+            "Workshop": {
+              "workers_needed": 1
+            }
+          }
+        }
+      ]
+    }
+  }
+}
