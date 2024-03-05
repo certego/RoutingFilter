@@ -1,4 +1,7 @@
 ## 2.2.x
+### 2.2.6
+#### Bugfix
+* Removed error logging in *filters.py*
 ### 2.2.5
 #### Bugfix
 * Fixed version in *setup.py*

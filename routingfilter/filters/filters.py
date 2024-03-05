@@ -316,9 +316,9 @@ class NetworkFilter(AbstractFilter):
                 if ip_address in IP(value):
                     return True
         except ValueError as e:
-            self.logger.error(f"Error in parsing IP address (value error): {e}. ")
+            self.logger.debug(f"Error in parsing IP address (value error): {e}. ")
         except TypeError as e:
-            self.logger.error(f"Error in parsing IP address (type error): {e}. ")
+            self.logger.debug(f"Error in parsing IP address (type error): {e}. ")
         return False
 
 
@@ -444,7 +444,7 @@ class ComparatorFilter(AbstractFilter):
                 term = float(term)
                 value = float(value)
             except ValueError as e:
-                self.logger.error(f"Error in parsing value to float in comparator filter: {e}. ")
+                self.logger.debug(f"Error in parsing value to float in comparator filter: {e}. ")
                 return False
             match self._comparator_type:
                 case "GREATER":
