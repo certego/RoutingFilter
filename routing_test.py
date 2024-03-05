@@ -39,6 +39,7 @@ class RoutingTestCase(unittest.TestCase):
         self.test_event_16 = load_test_data("test_event_16")
         self.test_event_17 = load_test_data("test_event_17")
         self.test_event_18 = load_test_data("test_event_18")
+        self.test_event_19 = load_test_data("test_event_19")
         self.test_event_with_list_1 = load_test_data("test_event_with_list_1")
         self.test_event_with_list_2 = load_test_data("test_event_with_list_2")
 
@@ -466,6 +467,12 @@ class RoutingTestCase(unittest.TestCase):
         ]
         self.routing.load_from_dicts(rule_list)
         self.assertEqual(self.routing.count(), 5)
+
+    def test_exist_source_ip(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_31_equals_exist")])
+        match = self.routing.match(self.test_event_19)
+        self.assertTrue(match)
+        self.assertDictEqual(match[0].output, {"Workshop": {"workers_needed": 1}})
 
 
 if __name__ == "__main__":

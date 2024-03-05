@@ -1,4 +1,7 @@
 ## 2.2.x
+### 2.2.7
+#### Bugfix
+* Fixed bug in exist filter
 ### 2.2.6
 #### Bugfix
 * Removed error logging in *filters.py*
