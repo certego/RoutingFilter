@@ -481,5 +481,9 @@ class RoutingTestCase(unittest.TestCase):
         self.assertTrue(match)
         self.assertDictEqual(match[0].output, {"Workshop": {"workers_needed": 1}})
 
+        self.test_event_20["ip"] = "4.4.4.4"
+        match = self.routing.match(self.test_event_20)
+        self.assertFalse(match)
+
 if __name__ == "__main__":
     unittest.main()
