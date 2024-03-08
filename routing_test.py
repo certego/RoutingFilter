@@ -40,6 +40,7 @@ class RoutingTestCase(unittest.TestCase):
         self.test_event_17 = load_test_data("test_event_17")
         self.test_event_18 = load_test_data("test_event_18")
         self.test_event_19 = load_test_data("test_event_19")
+        self.test_event_20 = load_test_data("test_event_20")
         self.test_event_with_list_1 = load_test_data("test_event_with_list_1")
         self.test_event_with_list_2 = load_test_data("test_event_with_list_2")
 
@@ -474,6 +475,11 @@ class RoutingTestCase(unittest.TestCase):
         self.assertTrue(match)
         self.assertDictEqual(match[0].output, {"Workshop": {"workers_needed": 1}})
 
+    def test_multiple_fields_equal(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_32_multiple_fields_equal")])
+        match = self.routing.match(self.test_event_20)
+        self.assertTrue(match)
+        self.assertDictEqual(match[0].output, {"Workshop": {"workers_needed": 1}})
 
 if __name__ == "__main__":
     unittest.main()

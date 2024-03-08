@@ -133,7 +133,10 @@ class StartswithFilter(AbstractFilter):
             event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for value in event_value:
-                return self._check_startswith(str(value))
+                if self._check_startswith(str(value)):
+                    return True
+        return False
+            
 
     def _check_startswith(self, value: str) -> bool:
         """
@@ -166,7 +169,9 @@ class EndswithFilter(AbstractFilter):
             event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for value in event_value:
-                return self._check_endswith(str(value))
+                if self._check_endswith(str(value)):
+                    return True
+        return False
 
     def _check_endswith(self, value):
         """
@@ -199,7 +204,9 @@ class KeywordFilter(AbstractFilter):
             event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for value in event_value:
-                return self._check_keyword(str(value))
+                if self._check_keyword(str(value)):
+                    return True
+        return False
 
     def _check_keyword(self, value: str) -> bool:
         """
@@ -247,7 +254,9 @@ class RegexpFilter(AbstractFilter):
             event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for value in event_value:
-                return self._check_regex(str(value))
+                if self._check_regex(str(value)):
+                    return True
+        return False
 
     def _check_regex(self, value: str) -> bool:
         """
@@ -299,7 +308,9 @@ class NetworkFilter(AbstractFilter):
             event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for ip_address in event_value:
-                return self._check_network(str(ip_address))
+                if self._check_network(str(ip_address)):
+                    return True
+        return False
 
     def _check_network(self, ip_address: str) -> bool:
         """
@@ -364,7 +375,9 @@ class DomainFilter(AbstractFilter):
             event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for value in event_value:
-                return self._check_domain(str(value))
+                if self._check_domain(str(value)):
+                    return True
+        return False
 
     def _check_domain(self, value: str) -> bool:
         """
@@ -428,7 +441,9 @@ class ComparatorFilter(AbstractFilter):
             event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for value in event_value:
-                return self._compare(value)
+                if self._compare(value):
+                    return True
+        return False
 
     def _compare(self, value: float) -> bool:
         """
