@@ -485,5 +485,6 @@ class RoutingTestCase(unittest.TestCase):
         match = self.routing.match(self.test_event_20)
         self.assertFalse(match)
 
+
 if __name__ == "__main__":
     unittest.main()

@@ -136,7 +136,6 @@ class StartswithFilter(AbstractFilter):
                 if self._check_startswith(str(value)):
                     return True
         return False
-            
 
     def _check_startswith(self, value: str) -> bool:
         """
