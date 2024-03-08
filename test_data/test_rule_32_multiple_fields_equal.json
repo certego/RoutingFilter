@@ -1,0 +1,30 @@
+{
+  "streams": {
+    "rules": {
+      "mountain_bike": [
+        {
+          "id": "equals-ffh4981",
+          "filters": [
+            {
+              "id": 5540,
+              "key": [
+                "ip2",
+                "ip",
+                "random_field"
+              ],
+              "type": "NETWORK",
+              "value": [
+                "127.0.0.0/24"
+              ]
+            }
+          ],
+          "streams": {
+            "Workshop": {
+              "workers_needed": 1
+            }
+          }
+        }
+      ]
+    }
+  }
+}

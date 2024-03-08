@@ -1,4 +1,7 @@
 ## 2.2.x
+### 2.2.8
+#### Bugfix
+* Fixed a bug when an existing fields didn't match
 ### 2.2.7
 #### Bugfix
 * Fixed bug in exist filter
