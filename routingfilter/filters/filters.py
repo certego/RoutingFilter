@@ -283,6 +283,7 @@ class NetworkFilter(AbstractFilter):
         :return: none or error generated
         :rtype: Optional[Exception]
         """
+        tmp = []
         for value in self._value:
             try:
                 value = IP(value)
@@ -292,7 +293,8 @@ class NetworkFilter(AbstractFilter):
             except TypeError as e:
                 self.logger.error(f"IP address (type error) error, during check of value {value} in list {self._value}. Error was: {e}.")
                 raise ValueError(f"IP address check failed: type error for value {value}.")
-        return None
+            tmp.append(value)
+        self._value = tmp
 
     def match(self, event: DictQuery) -> bool:
         """
@@ -323,7 +325,7 @@ class NetworkFilter(AbstractFilter):
         try:
             ip_address = IP(ip_address)
             for value in self._value:
-                if ip_address in IP(value):
+                if ip_address in value:
                     return True
         except ValueError as e:
             self.logger.debug(f"Error in parsing IP address (value error): {e}. ")

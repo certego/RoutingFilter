@@ -124,6 +124,13 @@ class RoutingTestCase(unittest.TestCase):
         self.assertTrue("Workshop" in self.test_event_1["certego"]["routing_history"])
         self.assertTrue("TyreFit" in self.test_event_1["certego"]["routing_history"])
 
+    def test_routing_history_no_customer(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_24_routing_history"), load_test_data("test_customer_1")])
+        self.routing.match(self.test_event_1)
+        self.routing.match(self.test_event_1, type_="customers")
+        self.assertTrue(self.test_event_1["certego"]["routing_history"]["Workshop"])
+        self.assertFalse(self.test_event_1["certego"]["routing_history"]["customer"]) #TODO FIX Customer should never be on history
+
     def test_routing_history_stream_none(self):
         self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])
         self.routing.match(self.test_event_1)
