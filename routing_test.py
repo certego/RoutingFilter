@@ -129,7 +129,7 @@ class RoutingTestCase(unittest.TestCase):
         self.routing.match(self.test_event_1)
         self.routing.match(self.test_event_1, type_="customers")
         self.assertTrue(self.test_event_1["certego"]["routing_history"]["Workshop"])
-        self.assertFalse(self.test_event_1["certego"]["routing_history"]["customer"]) #TODO FIX Customer should never be on history
+        self.assertNotIn("customer", self.test_event_1["certego"]["routing_history"])
 
     def test_routing_history_stream_none(self):
         self.routing.load_from_dicts([load_test_data("test_rule_1_equals")])

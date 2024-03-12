@@ -48,7 +48,8 @@ class Rule:
             if key in routing_history:
                 output_copy.pop(key)
             else:
-                routing_history.update({key: now})
+                if key != "customer":
+                    routing_history.update({key: now})
         results = Results(rules=self.uid, output=output_copy)
         return results
 
