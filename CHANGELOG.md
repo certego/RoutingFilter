@@ -1,4 +1,9 @@
 ## 2.2.x
+### 2.2.9
+#### Bugfix
+* Fixed customer routing history
+#### Changes
+* Updated _check_value() method in filters
 ### 2.2.8
 #### Bugfix
 * Fixed a bug when an existing fields didn't match
