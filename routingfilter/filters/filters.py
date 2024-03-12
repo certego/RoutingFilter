@@ -259,12 +259,14 @@ class RegexpFilter(AbstractFilter):
         :return: none or error generated:
         :rtype: Optional[Exception]
         """
+        tmp = []
         for value in self._value:
             try:
-                re.compile(value)
+                tmp.append(re.compile(value))
             except re.error as e:
                 self.logger.error(f"Invalid regex {value}, during check of value list {self._value}. Error message: {e}")
                 raise ValueError(f"Regex check failed: error for value {value}. Error message: {e}")
+        self._value = tmp
 
     def match(self, event: DictQuery) -> bool:
         """
@@ -293,7 +295,7 @@ class RegexpFilter(AbstractFilter):
         :rtype: bool
         """
         for regex in self._value:
-            if re.search(regex, value):
+            if regex.search(value):
                 return True
         return False
 
