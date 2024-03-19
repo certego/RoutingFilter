@@ -1,0 +1,10 @@
+{
+    "tags": ["mountain_bike", "city_bike"],
+    "wheel_model": "SuperLight",
+    "is_phishing": true,
+    "gears": "1x12",
+    "suspension": "full",
+    "ip": "127.0.0.1",
+    "ip2": "100.0.0.1",
+    "price": 600
+}
