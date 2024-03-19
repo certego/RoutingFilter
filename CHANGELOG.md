@@ -1,3 +1,9 @@
+## 2.3.x
+### 2.3.0
+#### Changes
+* Added multiple variables management
+#### Bugfix
+* Fixed bug in equal filter about upper and lower case
 ## 2.2.x
 ### 2.2.9
 #### Bugfix
