@@ -1,4 +1,7 @@
 ## 2.3.x
+### 2.3.3
+#### Changes
+* Bumped package version to match tag
 ### 2.3.0
 #### Changes
 * Added multiple variables management
