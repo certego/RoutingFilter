@@ -210,6 +210,8 @@ class Routing:
                 if not isinstance(self.variables[value], list):
                     self.variables[value] = [self.variables[value]]
                 variable_values.extend(self.variables[value])
+            elif not value.startswith("$"):
+                variable_values.append(value)
         if variable_values:
             res = variable_values
         else:

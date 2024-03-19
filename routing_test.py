@@ -3,6 +3,7 @@ import json
 import os
 import unittest
 
+from IPy import IP
 from routingfilter.filters import filters
 from routingfilter.routing import Routing
 
@@ -384,6 +385,17 @@ class RoutingTestCase(unittest.TestCase):
             [load_test_data("test_rule_27_network_variables_list2")], variables={"$INTERNAL_IPS": ["192.168.1.0/24", "192.168.2.0/24"]}
         )
         self.assertTrue(self.routing.match(self.test_event_4))
+
+    def test_multiple_variables_list(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_33_network_multiple_variables")], variables={"$HOME_NET": ["192.168.1.0/24"]})
+        self.assertDictEqual(self.routing.variables, {"$HOME_NET": ["192.168.1.0/24"]})
+        values = self.routing.streams._ruleManagers["ip_traffic"]._rules[0]._filters[0]._value
+        self.assertEqual([IP("192.168.1.0/24"), IP("10.0.0.1")], values)
+        self.assertTrue(self.routing.match(self.test_event_4))
+
+    def test_rule_upper_case_value(self):
+        self.routing.load_from_dicts([load_test_data("test_rule_34_upper_case")])
+        self.assertTrue(self.routing.match(load_test_data("test_event_upper_case_value")))
 
     def test_rule_in_routing_history(self):
         rule = {

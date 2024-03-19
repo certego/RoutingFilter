@@ -8,8 +8,8 @@
               "type": "NETWORK",
               "key": "src_addr",
               "value": [
-                "$INTERNAL_IPS",
-                "$HOME_NET"
+                "$HOME_NET",
+                "10.0.0.1"
               ]
             }
           ],

@@ -93,7 +93,7 @@ class EqualFilter(AbstractFilter):
     def _check_value(self) -> Exception | NoReturn:
         tmp = []
         for value in self._value:
-            value = value.lower() if isinstance(value, str) else str(value)
+            value = str(value).lower()
             tmp.append(value)
         self._value = tmp
 
@@ -110,7 +110,7 @@ class EqualFilter(AbstractFilter):
             event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for value in event_value:
-                value = value.lower() if isinstance(value, str) else str(value)
+                value = str(value).lower()
                 if value in self._value:
                     return True
         return False
@@ -245,6 +245,7 @@ class KeywordFilter(AbstractFilter):
         :return: true or false
         :rtype: bool
         """
+        value = value.lower()
         for keyword in self._value:
             if keyword in value.lower():
                 return True
