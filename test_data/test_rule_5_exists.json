@@ -3,6 +3,7 @@
     "rules": {
       "mountain_bike": [
         {
+          "id": "exists-fh0wery",
           "filters": [
             {
               "type": "EXISTS",

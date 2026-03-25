@@ -1,0 +1,38 @@
+{
+  "streams": {
+    "rules": {
+      "city_bike": [
+        {
+          "filters": [
+            {
+              "type": "EQUALS",
+              "key": [
+                "wheel_model"
+              ],
+              "value": [
+                "sUPerLight"
+              ]
+            },
+            {
+              "type": "EQUALS",
+              "key": "is_phishing",
+              "value": [
+                "TRUE"
+              ]
+            },
+            {
+              "type": "EQUALS",
+              "key": "price",
+              "value": [
+                600
+              ]
+            }
+          ],
+          "streams": {
+          }
+        }
+      ]
+    }
+  }
+}
+

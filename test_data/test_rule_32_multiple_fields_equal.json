@@ -1,17 +1,20 @@
 {
   "streams": {
     "rules": {
-      "all": [
+      "mountain_bike": [
         {
-          "id": "equals-fbh49ry29",
+          "id": "equals-ffh4981",
           "filters": [
             {
-              "type": "EQUALS",
-              "key": "wheel_model",
-              "description": "Carbon fiber wheels needs manual truing",
+              "id": 5540,
+              "key": [
+                "ip2",
+                "ip",
+                "random_field"
+              ],
+              "type": "NETWORK",
               "value": [
-                "Superlight",
-                "RacePro"
+                "127.0.0.0/24"
               ]
             }
           ],

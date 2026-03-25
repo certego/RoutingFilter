@@ -3,13 +3,14 @@
     "rules": {
       "mountain_bike": [
         {
+          "id": "equals-fbh49ry29",
           "filters": [
             {
               "type": "EQUALS",
               "key": "wheel_model",
               "description": "Carbon fiber wheels needs manual truing",
               "value": [
-                "Superlight",
+                "superlight",
                 "RacePro"
               ]
             }

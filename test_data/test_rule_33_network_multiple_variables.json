@@ -1,17 +1,15 @@
 {
   "streams": {
     "rules": {
-      "all": [
+      "ip_traffic": [
         {
-          "id": "equals-fbh49ry29",
           "filters": [
             {
-              "type": "EQUALS",
-              "key": "wheel_model",
-              "description": "Carbon fiber wheels needs manual truing",
+              "type": "NETWORK",
+              "key": "src_addr",
               "value": [
-                "Superlight",
-                "RacePro"
+                "$HOME_NET",
+                "10.0.0.1"
               ]
             }
           ],

@@ -69,6 +69,5 @@ jobs:
         isort ./buffalogs --sp .github/configurations/python_linters/.isort.cfg --profile black --filter-files --check-only --diff
     - name: Test with pytest
       run: |
-        source ../venv/bin/activate
+        source ./venv/bin/activate
         pytest routing_test.py
-      working-directory: ./routingfilter

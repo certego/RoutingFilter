@@ -1,3 +1,60 @@
+## 2.3.x
+### 2.3.3
+#### Changes
+* Bumped package version to match tag
+### 2.3.0
+#### Changes
+* Added multiple variables management
+#### Bugfix
+* Fixed bug in equal filter about upper and lower case
+## 2.2.x
+### 2.2.9
+#### Bugfix
+* Fixed customer routing history
+#### Changes
+* Updated _check_value() method in filters
+### 2.2.8
+#### Bugfix
+* Fixed a bug when an existing fields didn't match
+### 2.2.7
+#### Bugfix
+* Fixed bug in exist filter
+### 2.2.6
+#### Bugfix
+* Removed error logging in *filters.py*
+### 2.2.5
+#### Bugfix
+* Fixed version in *setup.py*
+### 2.2.4
+#### Bugfix
+* Removed warning logging in *\_substitute_variables*
+### 2.2.3
+#### Bugfix
+* Fixed rule get_stats 
+### 2.2.2
+#### Bugfix
+* Fixed result output
+* Fixed customer stream type
+* Fixed equal filter
+### 2.2.1
+#### Bugfix
+* Fixed bug in *match()* method of *Routing* class
+### 2.2.0
+#### Features
+* Added *to_dict()* method to Results class
+#### Changes
+* Updated *setup.py*
+
+## 2.1.x
+### 2.1.0
+#### Features
+* Added count method in Routing
+
+## 2.0.x
+### 2.0.0
+#### Changes
+* Refactoring of Routing Filter Class (object-oriented)
+
 ## 1.6.x
 ### 1.6.3
 #### Bugfix
