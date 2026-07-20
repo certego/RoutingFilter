@@ -1,10 +1,10 @@
+import ipaddress
 import logging
 import re
 from abc import ABC, abstractmethod
 from typing import NoReturn, Optional
 
 import macaddress
-from IPy import IP
 from routingfilter.dictquery import DictQuery
 
 
@@ -315,7 +315,7 @@ class NetworkFilter(AbstractFilter):
         tmp = []
         for value in self._value:
             try:
-                value = IP(value)
+                value = ipaddress.ip_network(value)
             except ValueError as e:
                 self.logger.error(f"IP address (value error) error, during check of value {value} in list {self._value}. Error was: {e}.")
                 raise ValueError(f"IP address check failed: value error for value {value}.")
@@ -352,9 +352,10 @@ class NetworkFilter(AbstractFilter):
         :rtype: bool
         """
         try:
-            ip_address = IP(ip_address)
+            network = ipaddress.ip_network(ip_address)
             for value in self._value:
-                if ip_address in value:
+                # Also check the IP protocol version because "supernet_of" raises a TypeError when comparing IPv4 and IPv6 addresses
+                if network.version == value.version and value.supernet_of(network):
                     return True
         except ValueError as e:
             self.logger.debug(f"Error in parsing IP address (value error): {e}. ")
@@ -588,7 +589,7 @@ class TypeofFilter(AbstractFilter):
                 return False
         except ValueError:
             try:
-                IP(value)
+                ipaddress.ip_address(value)
                 return True
             except ValueError:
                 return False

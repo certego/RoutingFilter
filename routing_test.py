@@ -1,9 +1,9 @@
 import copy
+import ipaddress
 import json
 import os
 import unittest
 
-from IPy import IP
 from routingfilter.filters import filters
 from routingfilter.routing import Routing
 
@@ -390,7 +390,7 @@ class RoutingTestCase(unittest.TestCase):
         self.routing.load_from_dicts([load_test_data("test_rule_33_network_multiple_variables")], variables={"$HOME_NET": ["192.168.1.0/24"]})
         self.assertDictEqual(self.routing.variables, {"$HOME_NET": ["192.168.1.0/24"]})
         values = self.routing.streams._ruleManagers["ip_traffic"]._rules[0]._filters[0]._value
-        self.assertEqual([IP("192.168.1.0/24"), IP("10.0.0.1")], values)
+        self.assertEqual([ipaddress.ip_network("192.168.1.0/24"), ipaddress.ip_network("10.0.0.1")], values)
         self.assertTrue(self.routing.match(self.test_event_4))
 
     def test_rule_upper_case_value(self):
