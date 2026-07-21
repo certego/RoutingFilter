@@ -1,2 +1,1 @@
-IPy~=1.1
 macaddress~=2.0.2

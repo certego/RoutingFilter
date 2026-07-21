@@ -5,10 +5,10 @@ with open("README.md", "r") as readme_file:
 
 setup(
     name="routingfilter",
-    version="2.3.3",
+    version="2.4.0",
     packages=find_packages(include=["routingfilter", "routingfilter.*"]),
     include_package_data=True,
-    install_requires=["IPy~=1.1", "macaddress~=2.0.2"],
+    install_requires=["macaddress~=2.0.2"],
     url="https://github.com/certego/RoutingFilter",
     license="GNU LGPLv3",
     author="Certego S.r.l.",

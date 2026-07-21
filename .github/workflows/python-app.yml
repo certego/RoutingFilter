@@ -12,14 +12,14 @@ on:
 jobs:
   detect-changes:
     name: Detect changes
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     outputs:
       python_code: ${{steps.diff_check.outputs.python_code}}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.base_ref }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           clean: false
       - name: Generate diffs
@@ -27,22 +27,23 @@ jobs:
         run: |
           git branch -a --list | cat
           PYTHON_CODE_CHANGES=$(git diff --compact-summary origin/${{ github.base_ref }} -- routingfilter/* | wc -l)
-          echo "::set-output name=python_code::$PYTHON_CODE_CHANGES"
+          echo "python_code=$PYTHON_CODE_CHANGES" >> "$GITHUB_OUTPUT"
 
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [ "detect-changes" ]
     if: ${{ needs.detect-changes.outputs.python_code > 0 }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v7
     - name: Set up Python
-      uses: actions/setup-python@v4
+      id: setup_python
+      uses: actions/setup-python@v7
       with:
         python-version: "3.10"
     - name: "Cache venv"
       id: cache_venv
-      uses: actions/cache@v3
+      uses: actions/cache@v6
       with:
         path: venv
         key: pip-${{ steps.setup_python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}

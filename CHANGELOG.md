@@ -1,3 +1,10 @@
+## 2.4.x
+### 2.4.0
+#### Bugfix
+* Fixed bug in CI about isort execution and cache
+#### Changes
+* Updated linters, required Python version (>3.10) and Github Actions
+* Removed dependency from `IPy` in favor of `ipdaddress` 
 ## 2.3.x
 ### 2.3.3
 #### Changes
