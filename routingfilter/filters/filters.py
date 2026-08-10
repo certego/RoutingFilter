@@ -2,7 +2,7 @@ import ipaddress
 import logging
 import re
 from abc import ABC, abstractmethod
-from typing import NoReturn, Optional
+from typing import Any
 
 import macaddress
 from routingfilter.dictquery import DictQuery
@@ -20,12 +20,13 @@ class AbstractFilter(ABC):
         return NotImplemented
 
     @abstractmethod
-    def _check_value(self) -> Exception | NoReturn:
+    def _check_value(self) -> None:
         """
         Check if values in self._value are correct and raise an exception if they are incorrect. If necessary, it converts value in lower case.
 
         :return: no value or raise an exception
-        :rtype: NoReturn | Exception
+        :rtype: None
+        :raises Exception: if the value is not correct
         """
         return NotImplemented
 
@@ -35,7 +36,7 @@ class AllFilter(AbstractFilter):
         key = value = []
         super().__init__(key, value)
 
-    def _check_value(self) -> Exception | NoReturn:
+    def _check_value(self) -> None:
         return
 
     def match(self, event: DictQuery) -> bool:
@@ -55,7 +56,7 @@ class ExistFilter(AbstractFilter):
         value = []
         super().__init__(key, value)
 
-    def _check_value(self) -> Exception | NoReturn:
+    def _check_value(self) -> None:
         return
 
     def match(self, event: DictQuery) -> bool:
@@ -90,7 +91,7 @@ class EqualFilter(AbstractFilter):
     def __init__(self, key, value):
         super().__init__(key, value)
 
-    def _check_value(self) -> Exception | NoReturn:
+    def _check_value(self) -> None:
         tmp = []
         for value in self._value:
             value = str(value).lower()
@@ -130,7 +131,7 @@ class NotEqualFilter(EqualFilter):
 
 
 class StartswithFilter(AbstractFilter):
-    def _check_value(self) -> Exception | NoReturn:
+    def _check_value(self) -> None:
         tmp = []
         for prefix in self._value:
             prefix = str(prefix).lower()
@@ -171,7 +172,7 @@ class StartswithFilter(AbstractFilter):
 
 
 class EndswithFilter(AbstractFilter):
-    def _check_value(self) -> Exception | NoReturn:
+    def _check_value(self) -> None:
         tmp = []
         for suffix in self._value:
             suffix = str(suffix).lower()
@@ -212,7 +213,7 @@ class EndswithFilter(AbstractFilter):
 
 
 class KeywordFilter(AbstractFilter):
-    def _check_value(self) -> Exception | NoReturn:
+    def _check_value(self) -> None:
         tmp = []
         for keyword in self._value:
             keyword = str(keyword).lower()
@@ -253,12 +254,13 @@ class KeywordFilter(AbstractFilter):
 
 
 class RegexpFilter(AbstractFilter):
-    def _check_value(self) -> Exception | NoReturn:
+    def _check_value(self) -> None:
         """
         Check if values in self._value are valid regexes.
 
         :return: none or error generated:
-        :rtype: Optional[Exception]
+        :rtype: None
+        :raises ValueError: regex check failed
         """
         tmp = []
         for value in self._value:
@@ -305,24 +307,26 @@ class NetworkFilter(AbstractFilter):
     def __init__(self, key, value):
         super().__init__(key, value)
 
-    def _check_value(self) -> Exception | NoReturn:
+    def _check_value(self) -> None:
         """
         Check if the values in self._value are valid IP addresses.
 
         :return: none or error generated
-        :rtype: Optional[Exception]
+        :rtype: None
+        :raises ValueError: IP address parsing failed
         """
         tmp = []
         for value in self._value:
             try:
-                value = ipaddress.ip_network(value)
+                network = ipaddress.ip_network(value)
             except ValueError as e:
                 self.logger.error(f"IP address (value error) error, during check of value {value} in list {self._value}. Error was: {e}.")
                 raise ValueError(f"IP address check failed: value error for value {value}.")
             except TypeError as e:
                 self.logger.error(f"IP address (type error) error, during check of value {value} in list {self._value}. Error was: {e}.")
                 raise ValueError(f"IP address check failed: type error for value {value}.")
-            tmp.append(value)
+            else:
+                tmp.append(network)
         self._value = tmp
 
     def match(self, event: DictQuery) -> bool:
@@ -381,7 +385,7 @@ class DomainFilter(AbstractFilter):
     def __init__(self, key, value):
         super().__init__(key, value)
 
-    def _check_value(self) -> Exception | NoReturn:
+    def _check_value(self) -> None:
         """
         Check if values in self._value are string.
 
@@ -434,12 +438,12 @@ class ComparatorFilter(AbstractFilter):
         self._check_comparator_type()
         super().__init__(key, value)
 
-    def _check_value(self) -> Exception | NoReturn:
+    def _check_value(self) -> None:
         """
         Check if values in self._value are float.
 
         :return: none or error generated
-        :rtype: Exception | NoReturn
+        :rtype: None
         """
         tmp = []
         for value in self._value:
@@ -450,12 +454,12 @@ class ComparatorFilter(AbstractFilter):
                 raise ValueError(f"Comparator check failed: value {value} is not a float")
         self._value = tmp
 
-    def _check_comparator_type(self) -> Exception | NoReturn:
+    def _check_comparator_type(self) -> None:
         """
         Check if comparator is valid.
 
         :return: none or error generated
-        :rtype: Exception | NoReturn
+        :rtype: None
         """
         if self._comparator_type not in ["GREATER", "LESS", "GREATER_EQ", "LESS_EQ"]:
             self.logger.error(f"Comparator check failed: value {self._comparator_type} is not valid.")
@@ -513,12 +517,12 @@ class TypeofFilter(AbstractFilter):
     def __init__(self, key, value):
         super().__init__(key, value)
 
-    def _check_value(self) -> Exception | NoReturn:
+    def _check_value(self) -> None:
         """
         Check if value is a correct type.
 
         :return: no value or raised an exception
-        :rtype: NoReturn | Exception
+        :rtype: None
         """
         valid_type = ["str", "int", "float", "bool", "list", "dict", "ip", "mac"]
         tmp = []
@@ -542,16 +546,17 @@ class TypeofFilter(AbstractFilter):
 
         for key in self._key:
             for val_type in self._value:
-                if self._check_type(event.get(key), val_type):
+                if TypeofFilter._check_type(event.get(key), val_type):
                     return True
         return False
 
-    def _check_type(self, value: any, val_type: str) -> bool:
+    @staticmethod
+    def _check_type(value: str | int | float | list | dict, val_type: str) -> bool:
         """
         Check type of the value.
 
         :param value: value to check
-        :type value: any
+        :type value: str | int | float | list | dict
         :param val_type: type
         :rtype str
         :return: true or false
@@ -570,17 +575,18 @@ class TypeofFilter(AbstractFilter):
         elif val_type == "dict":
             return type(value) is dict
         elif val_type == "ip":
-            return self._check_ip(value)
+            return TypeofFilter._check_ip(value)
         elif val_type == "mac":
-            return self._check_mac(value)
+            return TypeofFilter._check_mac(value)
         return False
 
-    def _check_ip(self, value: any) -> bool:
+    @staticmethod
+    def _check_ip(value: Any) -> bool:
         """
         Check if value is IP address.
 
         :param value: value to check
-        :type: any
+        :type: Any
         :return: true or false
         :rtype: bool
         """
@@ -590,18 +596,21 @@ class TypeofFilter(AbstractFilter):
         except ValueError:
             try:
                 ipaddress.ip_address(value)
-                return True
             except ValueError:
                 return False
             except TypeError:
                 return False
+            else:
+                return True
+        return False
 
-    def _check_mac(self, value: any) -> bool:
+    @staticmethod
+    def _check_mac(value: Any) -> bool:
         """
         Check if value is a MAC address.
 
         :param value: value to check
-        :type value: any
+        :type value: Any
         :return: true or false
         :rtype: bool
         """

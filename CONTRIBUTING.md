@@ -1,4 +1,4 @@
-i# Contributing to pcapoptikon
+# Contributing to RoutingFilter
 
 Thank you for your interest in contributing to Certego’s Open Source projects! To protect you, our users, and the integrity of the software, we require all contributors to accept our **Contributor License Agreement (CLA)**.
 

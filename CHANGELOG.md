@@ -1,9 +1,13 @@
+## 2.5.x
+### 2.5.0
+#### Changes
+* Fixed type hints and improved filter robustness
 ## 2.4.x
 ### 2.4.0
 #### Bugfix
 * Fixed bug in CI about isort execution and cache
 #### Changes
-* Updated linters, required Python version (>3.10) and Github Actions
+* Updated linters, required Python version (>3.10) and GitHub Actions
 * Removed dependency from `IPy` in favor of `ipdaddress` 
 ## 2.3.x
 ### 2.3.3
@@ -65,7 +69,7 @@
 ## 1.6.x
 ### 1.6.3
 #### Bugfix
-* Fix overwriting of certego field
+* Fix overwriting of `certego` field
 ### 1.6.2
 #### Bugfix
 * Added filter in routing_filter
@@ -147,7 +151,7 @@
 * An exception is returned (instead of False) when processing a wrong filter type
 ### 1.1.0
 #### Changes
-* Changed match output to to list of dicts, to allow multiple rules with different tags to match
+* Changed match output to list of dicts, to allow multiple rules with different tags to match
 * Now the method laod_from_dicts returns nothing; a new getter has been added to retrieve the currently loaded rules
 
 ## 1.0.x
