@@ -1,7 +1,7 @@
 ## 2.5.x
 ### 2.5.0
 #### Changes
-* Fixed type hints and improved filter robustness
+* Fixed type hints and improved filter robustness, cleaned `.gitignore`
 * Migrated packaging metadata from `setup.py` to `pyproject.toml`: removed `setup.py`, `requirements.txt`, `requirements_dev.txt` and `MANIFEST.in`. Development dependencies are now the `dev` extra, installed with `pip install -e ".[dev]"`
 ## 2.4.x
 ### 2.4.0

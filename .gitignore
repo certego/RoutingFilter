@@ -1,41 +1,35 @@
-.vscode
-venv
-.ropeproject
+# IDE and editors
+.idea/
+.vscode/
+.ropeproject/
 
-# compiled source
-*.com
-*.class
-*.dll
-*.exe
-*.o
-*.so
+# Virtual environments
+venv/
+.venv/
+
+# Byte-compiled files
+__pycache__/
 *.pyc
 
-# packages
-*.7z
-*.dmg
-*.iso
-*.jar
-*.rar
+# Caches
+.pytest_cache/
 
-# logs and databases
+# Logs and databases
 *.log
 *.log.*
-*.sql
-*.sqlite
+
+# Environment files
+.env
 
 # OS generated files
 .DS_Store
 .DS_Store?
 ._*
 
-# Pycharm
-.idea/
-
 # Documentation
-docs/_build
+docs/_build/
 
 # Build files
 build/
 dist/
-routingfilter.egg-info/
+*.egg-info/
