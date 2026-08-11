@@ -3,6 +3,8 @@
 #### Changes
 * Fixed type hints and improved filter robustness, cleaned `.gitignore`
 * Migrated packaging metadata from `setup.py` to `pyproject.toml`: removed `setup.py`, `requirements.txt`, `requirements_dev.txt` and `MANIFEST.in`. Development dependencies are now the `dev` extra, installed with `pip install -e ".[dev]"`
+* Python 3.12 is now the minimum required version (was 3.10)
+* Updated linters and aligned the pre-commit hook revisions with the `dev` extra pins
 ## 2.4.x
 ### 2.4.0
 #### Bugfix
