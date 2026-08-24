@@ -504,6 +504,15 @@ class RoutingTestCase(unittest.TestCase):
         match = self.routing.match(self.test_event_20)
         self.assertFalse(match)
 
+    def test_comparator_filter_and_ip_empty_dict(self):
+        # GREATER, LESS, GREATER_EQ and LESS_EQ are all backed by the same ComparatorFilter, so a single comparator
+        # is enough to cover the case of a key resolving to a dict instead of to a number.
+        self.routing.load_from_dicts([load_test_data("test_rule_35_less_empty_dict")])  # LESS but trying to read dict subfield inside an empty dict
+        self.assertFalse(self.routing.match(self.test_event_13))
+        # TYPEOF "ip" casts the event value to int, so it must not raise when the key resolves to a dict or to None
+        self.routing.load_from_dicts([load_test_data("test_rule_36_typeof_ip_empty_dict")])
+        self.assertFalse(self.routing.match(self.test_event_13))
+
 
 if __name__ == "__main__":
     unittest.main()

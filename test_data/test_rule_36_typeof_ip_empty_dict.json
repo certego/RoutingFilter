@@ -1,0 +1,38 @@
+{
+  "streams": {
+    "rules": {
+      "mountain_bike": [
+        {
+          "filters": [
+            {
+              "type": "TYPEOF",
+              "key": "empty_dict.price",
+              "description": "Filter reading a subfield of an empty dict, so the key resolves to a dict",
+              "value": "ip"
+            }
+          ],
+          "streams": {
+            "Workshop": {
+              "workers_needed": 1
+            }
+          }
+        },
+        {
+          "filters": [
+            {
+              "type": "TYPEOF",
+              "key": "missing_field",
+              "description": "Filter reading a key which is not present in the event, so it resolves to None",
+              "value": "ip"
+            }
+          ],
+          "streams": {
+            "Workshop": {
+              "workers_needed": 2
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -449,7 +449,7 @@ class ComparatorFilter(AbstractFilter):
         for value in self._value:
             try:
                 tmp.append(float(value))
-            except ValueError:
+            except (TypeError, ValueError):
                 self.logger.error(f"Comparator check failed: value {value} of list {self._value} is not a float")
                 raise ValueError(f"Comparator check failed: value {value} is not a float")
         self._value = tmp
@@ -482,21 +482,22 @@ class ComparatorFilter(AbstractFilter):
                     return True
         return False
 
-    def _compare(self, value: float) -> bool:
+    def _compare(self, value: Any) -> bool:
         """
-        Compare value to term in _value.
+        Compare value to term in _value. If the value cannot be converted to float (e.g. the event field is missing
+        and the key resolves to a dict or to None), return False.
 
         :param value: value to compare
-        :type value: float
+        :type value: Any
         :return: true or false
         :rtype: bool
         """
+        try:
+            value = float(value)
+        except (TypeError, ValueError) as e:
+            self.logger.debug(f"Error in parsing value to float in comparator filter: {e}. ")
+            return False
         for term in self._value:
-            try:
-                value = float(value)
-            except ValueError as e:
-                self.logger.debug(f"Error in parsing value to float in comparator filter: {e}. ")
-                return False
             match self._comparator_type:
                 case "GREATER":
                     if value > term:
@@ -583,7 +584,8 @@ class TypeofFilter(AbstractFilter):
     @staticmethod
     def _check_ip(value: Any) -> bool:
         """
-        Check if value is IP address.
+        Check if value is IP address. Values which are neither numbers nor IP addresses (e.g. a missing event field
+        resolving to None or to a dict) are not IP addresses, so False is returned.
 
         :param value: value to check
         :type: Any
@@ -593,12 +595,10 @@ class TypeofFilter(AbstractFilter):
         try:
             if isinstance(value, int) or int(value):
                 return False
-        except ValueError:
+        except (ValueError, TypeError):
             try:
                 ipaddress.ip_address(value)
-            except ValueError:
-                return False
-            except TypeError:
+            except (ValueError, TypeError):
                 return False
             else:
                 return True

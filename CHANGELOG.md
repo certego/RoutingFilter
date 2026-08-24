@@ -1,17 +1,22 @@
 ## 2.5.x
 ### 2.5.0
+#### Bugfix
+* Fixed `TypeError` raised by the `GREATER`, `LESS`, `GREATER_EQ` and `LESS_EQ` filters when the event key resolves to a dict (e.g. reading a subfield of an empty dict) instead of to a number: the filter now does not match
+* Fixed the same class of `TypeError` in the `TYPEOF` filter with value `ip`, raised when the event key is missing or resolves to a dict or to a list
 #### Changes
 * Fixed type hints and improved filter robustness, cleaned `.gitignore`
 * Migrated packaging metadata from `setup.py` to `pyproject.toml`: removed `setup.py`, `requirements.txt`, `requirements_dev.txt` and `MANIFEST.in`. Development dependencies are now the `dev` extra, installed with `pip install -e ".[dev]"`
 * Python 3.12 is now the minimum required version (was 3.10)
 * Updated linters and aligned the pre-commit hook revisions with the `dev` extra pins
+
 ## 2.4.x
 ### 2.4.0
 #### Bugfix
 * Fixed bug in CI about isort execution and cache
 #### Changes
 * Updated linters, required Python version (>3.10) and GitHub Actions
-* Removed dependency from `IPy` in favor of `ipdaddress` 
+* Removed dependency from `IPy` in favor of `ipdaddress`
+
 ## 2.3.x
 ### 2.3.3
 #### Changes
@@ -21,6 +26,7 @@
 * Added multiple variables management
 #### Bugfix
 * Fixed bug in equal filter about upper and lower case
+
 ## 2.2.x
 ### 2.2.9
 #### Bugfix
