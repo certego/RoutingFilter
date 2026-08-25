@@ -12,7 +12,7 @@ All commands are run from the **repository root** (not from the inner `routingfi
 
 ```bash
 # Install for development
-pip install -r requirements.txt -r requirements_dev.txt
+pip install -e ".[dev]"
 pre-commit install -c .github/.pre-commit-config.yaml
 
 # Run the full test suite
@@ -93,4 +93,4 @@ Extensive real examples of both rules and events live in `test_data/` (`test_rul
 
 ## Release process
 
-Update `requirements.txt`/`setup.py` if needed, add a `CHANGELOG.md` entry, bump the version in `setup.py`, merge to `master`, then publish a GitHub release tagged with the version — CI (`python-publish.yml`) publishes to PyPI automatically.
+Update the dependencies in `pyproject.toml` if needed, add a `CHANGELOG.md` entry, bump `version` in `pyproject.toml`, merge to `master`, then publish a GitHub release tagged with the version — CI (`python-publish.yml`) publishes to PyPI automatically.

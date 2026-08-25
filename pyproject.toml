@@ -1,6 +1,36 @@
 [build-system]
-requires = [
-    "setuptools>=60",
-    "wheel"
-]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "routingfilter"
+version = "2.5.0"
+description = "Generic Business Logic Implementation for Routing objects as python dictionaries"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "LGPL-3.0-or-later"
+license-files = ["LICENSE.txt"]
+authors = [{ name = "Certego S.r.l.", email = "support@certego.net" }]
+dependencies = ["macaddress~=2.0.2"]
+classifiers = [
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.optional-dependencies]
+# The linter pins below must stay in sync with the hook revisions in .github/.pre-commit-config.yaml: nothing enforces it automatically.
+dev = [
+    "black==26.5.1",
+    "flake8==7.3.0",
+    "isort==8.0.1",
+    "pre-commit==4.6.2",
+    "pytest",
+]
+
+[project.urls]
+Homepage = "https://github.com/certego/RoutingFilter"
+
+[tool.setuptools.packages.find]
+include = ["routingfilter*"]
