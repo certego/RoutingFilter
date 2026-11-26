@@ -3,7 +3,7 @@ import logging
 import uuid
 from typing import List, Optional
 
-from .dictquery import DictQuery
+from .dictquery import CachedDictQuery
 from .filters import filters
 from .filters.results import Results
 from .filters.rule import Rule, RuleManager
@@ -74,7 +74,7 @@ class Routing:
         if "routing_history" not in event["certego"]:
             event["certego"]["routing_history"] = {}
 
-        event_dictquery = DictQuery(event)
+        event_dictquery = CachedDictQuery(event)
 
         # check stream
         if type_ == "streams":

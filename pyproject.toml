@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "routingfilter"
-version = "2.5.0"
+version = "2.5.1"
 description = "Generic Business Logic Implementation for Routing objects as python dictionaries"
 readme = "README.md"
 requires-python = ">=3.12"
