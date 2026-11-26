@@ -1,11 +1,24 @@
+import functools
 import ipaddress
 import logging
+import math
 import re
 from abc import ABC, abstractmethod
+from bisect import bisect_right
 from typing import Any
 
 import macaddress
 from routingfilter.dictquery import DictQuery
+
+
+@functools.lru_cache(maxsize=4096)
+def _parse_network(text: str) -> tuple[int, int, int] | None:
+    """Parse a string into (IP version, first address, last address) as integers, or None if it is not a valid network. Cached, including the failures."""
+    try:
+        network = ipaddress.ip_network(text)
+    except (ValueError, TypeError):
+        return None
+    return network.version, int(network.network_address), int(network.broadcast_address)
 
 
 class AbstractFilter(ABC):
@@ -92,11 +105,8 @@ class EqualFilter(AbstractFilter):
         super().__init__(key, value)
 
     def _check_value(self) -> None:
-        tmp = []
-        for value in self._value:
-            value = str(value).lower()
-            tmp.append(value)
-        self._value = tmp
+        self._value = [str(value).lower() for value in self._value]
+        self._value_set = frozenset(self._value)
 
     def match(self, event: DictQuery):
         """
@@ -111,8 +121,7 @@ class EqualFilter(AbstractFilter):
             event_value = event.get(key, [])
             event_value = event_value if isinstance(event_value, list) else [event_value]
             for value in event_value:
-                value = str(value).lower()
-                if value in self._value:
+                if str(value).lower() in self._value_set:
                     return True
         return False
 
@@ -132,11 +141,8 @@ class NotEqualFilter(EqualFilter):
 
 class StartswithFilter(AbstractFilter):
     def _check_value(self) -> None:
-        tmp = []
-        for prefix in self._value:
-            prefix = str(prefix).lower()
-            tmp.append(prefix)
-        self._value = tmp
+        self._value = [str(prefix).lower() for prefix in self._value]
+        self._prefixes = tuple(self._value)
 
     def match(self, event: DictQuery) -> bool:
         """
@@ -164,20 +170,13 @@ class StartswithFilter(AbstractFilter):
         :return: true or false
         :rtype: bool
         """
-        value = value.lower()
-        for prefix in self._value:
-            if value.startswith(prefix):
-                return True
-        return False
+        return value.lower().startswith(self._prefixes)
 
 
 class EndswithFilter(AbstractFilter):
     def _check_value(self) -> None:
-        tmp = []
-        for suffix in self._value:
-            suffix = str(suffix).lower()
-            tmp.append(suffix)
-        self._value = tmp
+        self._value = [str(suffix).lower() for suffix in self._value]
+        self._suffixes = tuple(self._value)
 
     def match(self, event: DictQuery) -> bool:
         """
@@ -205,20 +204,12 @@ class EndswithFilter(AbstractFilter):
         :return: true or false
         :rtype: bool
         """
-        value = value.lower()
-        for suffix in self._value:
-            if value.endswith(suffix):
-                return True
-        return False
+        return value.lower().endswith(self._suffixes)
 
 
 class KeywordFilter(AbstractFilter):
     def _check_value(self) -> None:
-        tmp = []
-        for keyword in self._value:
-            keyword = str(keyword).lower()
-            tmp.append(keyword)
-        self._value = tmp
+        self._value = [str(keyword).lower() for keyword in self._value]
 
     def match(self, event: DictQuery) -> bool:
         """
@@ -248,7 +239,7 @@ class KeywordFilter(AbstractFilter):
         """
         value = value.lower()
         for keyword in self._value:
-            if keyword in value.lower():
+            if keyword in value:
                 return True
         return False
 
@@ -328,6 +319,16 @@ class NetworkFilter(AbstractFilter):
             else:
                 tmp.append(network)
         self._value = tmp
+        self._starts = {4: [], 6: []}
+        self._ends = {4: [], 6: []}
+        # CIDR blocks are either nested or disjoint: keeping only the outermost ones leaves sorted disjoint intervals
+        for network in sorted(self._value, key=lambda n: (n.version, int(n.network_address), n.prefixlen)):
+            start, end = int(network.network_address), int(network.broadcast_address)
+            ends = self._ends[network.version]
+            if ends and start <= ends[-1]:
+                continue
+            self._starts[network.version].append(start)
+            ends.append(end)
 
     def match(self, event: DictQuery) -> bool:
         """
@@ -355,17 +356,13 @@ class NetworkFilter(AbstractFilter):
         :return: true or false
         :rtype: bool
         """
-        try:
-            network = ipaddress.ip_network(ip_address)
-            for value in self._value:
-                # Also check the IP protocol version because "supernet_of" raises a TypeError when comparing IPv4 and IPv6 addresses
-                if network.version == value.version and value.supernet_of(network):
-                    return True
-        except ValueError as e:
-            self.logger.debug(f"Error in parsing IP address (value error): {e}. ")
-        except TypeError as e:
-            self.logger.debug(f"Error in parsing IP address (type error): {e}. ")
-        return False
+        parsed = _parse_network(ip_address)
+        if parsed is None:
+            self.logger.debug(f"Error in parsing IP address: {ip_address!r} is not a valid network. ")
+            return False
+        version, start, end = parsed
+        index = bisect_right(self._starts[version], start) - 1
+        return index >= 0 and end <= self._ends[version][index]
 
 
 class NotNetworkFilter(NetworkFilter):
@@ -396,9 +393,10 @@ class DomainFilter(AbstractFilter):
         for domain in self._value:
             if not isinstance(domain, str):
                 raise ValueError(f"Domain check failed: value {domain} is not a string.")
-            domain = str(domain).lower()
-            tmp.append(domain)
+            tmp.append(domain.lower())
         self._value = tmp
+        self._domains = frozenset(self._value)
+        self._dot_suffixes = tuple(f".{domain}" for domain in self._value)
 
     def match(self, event: DictQuery) -> bool:
         """
@@ -426,10 +424,7 @@ class DomainFilter(AbstractFilter):
         :return:
         """
         value = value.lower()
-        for domain in self._value:
-            if value == domain or value.endswith(f".{domain}"):
-                return True
-        return False
+        return value in self._domains or value.endswith(self._dot_suffixes)
 
 
 class ComparatorFilter(AbstractFilter):
@@ -453,6 +448,14 @@ class ComparatorFilter(AbstractFilter):
                 self.logger.error(f"Comparator check failed: value {value} of list {self._value} is not a float")
                 raise ValueError(f"Comparator check failed: value {value} is not a float")
         self._value = tmp
+        # A NaN term never matches, and min()/max() would return NaN depending on its position
+        terms = [term for term in self._value if not math.isnan(term)]
+        if not terms:
+            self._threshold = None
+        elif self._comparator_type in ("GREATER", "GREATER_EQ"):
+            self._threshold = min(terms)
+        else:
+            self._threshold = max(terms)
 
     def _check_comparator_type(self) -> None:
         """
@@ -484,8 +487,8 @@ class ComparatorFilter(AbstractFilter):
 
     def _compare(self, value: Any) -> bool:
         """
-        Compare value to term in _value. If the value cannot be converted to float (e.g. the event field is missing
-        and the key resolves to a dict or to None), return False.
+        Compare value to the threshold derived from _value. If the value cannot be converted to float (e.g. the event field is missing
+        and the key resolves to a dict or to None), return False. An int too large for a float is compared as +/-infinity.
 
         :param value: value to compare
         :type value: Any
@@ -494,23 +497,22 @@ class ComparatorFilter(AbstractFilter):
         """
         try:
             value = float(value)
+        except OverflowError:
+            value = math.inf if value > 0 else -math.inf
         except (TypeError, ValueError) as e:
             self.logger.debug(f"Error in parsing value to float in comparator filter: {e}. ")
             return False
-        for term in self._value:
-            match self._comparator_type:
-                case "GREATER":
-                    if value > term:
-                        return True
-                case "LESS":
-                    if value < term:
-                        return True
-                case "GREATER_EQ":
-                    if value >= term:
-                        return True
-                case "LESS_EQ":
-                    if value <= term:
-                        return True
+        if self._threshold is None:
+            return False
+        match self._comparator_type:
+            case "GREATER":
+                return value > self._threshold
+            case "LESS":
+                return value < self._threshold
+            case "GREATER_EQ":
+                return value >= self._threshold
+            case "LESS_EQ":
+                return value <= self._threshold
         return False
 
 

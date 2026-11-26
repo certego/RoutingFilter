@@ -1,4 +1,10 @@
 ## 2.5.x
+### 2.5.1
+#### Bugfix
+* Fixed `OverflowError` raised by the `GREATER`, `LESS`, `GREATER_EQ` and `LESS_EQ` filters when the event value is an integer too large for a float: it is now compared as positive or negative infinity according to its sign
+#### Changes
+* Faster matching of the `EQUALS`, `NOT_EQUALS`, `STARTSWITH`, `ENDSWITH`, `KEYWORD`, `DOMAIN`, `NETWORK`, `NOT_NETWORK` and comparator (`GREATER`, `LESS`, `GREATER_EQ`, `LESS_EQ`) filters when a filter has many values: match results are unchanged
+* `Routing.match` now caches the event field lookups for the duration of the call, except those under `certego.routing_history`
 ### 2.5.0
 #### Bugfix
 * Fixed `TypeError` raised by the `GREATER`, `LESS`, `GREATER_EQ` and `LESS_EQ` filters when the event key resolves to a dict (e.g. reading a subfield of an empty dict) instead of to a number: the filter now does not match

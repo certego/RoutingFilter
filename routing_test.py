@@ -4,6 +4,7 @@ import json
 import os
 import unittest
 
+from routingfilter.dictquery import CachedDictQuery, DictQuery
 from routingfilter.filters import filters
 from routingfilter.routing import Routing
 
@@ -512,6 +513,163 @@ class RoutingTestCase(unittest.TestCase):
         # TYPEOF "ip" casts the event value to int, so it must not raise when the key resolves to a dict or to None
         self.routing.load_from_dicts([load_test_data("test_rule_36_typeof_ip_empty_dict")])
         self.assertFalse(self.routing.match(self.test_event_13))
+
+
+class FilterEdgeCasesTestCase(unittest.TestCase):
+    """Edge cases of the filters and of the lookup cache: each test guards one of the matching optimisations."""
+
+    def match(self, filter_, value):
+        return filter_.match(DictQuery({"field": value}))
+
+    def test_startswith_and_endswith_empty_value(self):
+        for filter_class in (filters.StartswithFilter, filters.EndswithFilter):
+            with self.subTest(filter=filter_class.__name__):
+                self.assertTrue(self.match(filter_class("field", [""]), "anything"))
+                self.assertFalse(self.match(filter_class("field", []), "anything"))
+
+    def test_startswith_and_endswith_non_string_event_values(self):
+        for value in (123, None, True):
+            with self.subTest(value=value):
+                self.assertTrue(self.match(filters.StartswithFilter("field", [str(value)[:2]]), value))
+                self.assertTrue(self.match(filters.EndswithFilter("field", [str(value)[-2:]]), value))
+
+    def test_startswith_and_endswith_case_and_multiple_values(self):
+        self.assertTrue(self.match(filters.StartswithFilter("field", ["zzz", "ABC"]), "abcdef"))
+        self.assertTrue(self.match(filters.EndswithFilter("field", ["zzz", "DEF"]), "ABCdef"))
+        self.assertFalse(self.match(filters.StartswithFilter("field", ["bc"]), "abcdef"))
+        self.assertFalse(self.match(filters.EndswithFilter("field", ["de"]), "abcdef"))
+
+    def test_equals_value_types(self):
+        self.assertTrue(self.match(filters.EqualFilter("field", "1"), 1))
+        self.assertFalse(self.match(filters.EqualFilter("field", 1.0), 1))
+        self.assertTrue(self.match(filters.EqualFilter("field", ["a", "B"]), ["x", "b"]))
+        self.assertFalse(self.match(filters.EqualFilter("field", ["a", "B"]), ["x", "y"]))
+
+    def test_not_equals_is_the_inverse(self):
+        filter_ = filters.NotEqualFilter("field", ["a", "b"])
+        self.assertFalse(self.match(filter_, "A"))
+        self.assertTrue(self.match(filter_, "c"))
+
+    def test_keyword_case_insensitive_and_literal(self):
+        self.assertTrue(self.match(filters.KeywordFilter("field", "ABC"), "xx abc yy"))
+        self.assertTrue(self.match(filters.KeywordFilter("field", "abc"), "xx ABC yy"))
+        self.assertTrue(self.match(filters.KeywordFilter("field", "a.b"), "xa.by"))
+        self.assertFalse(self.match(filters.KeywordFilter("field", "a.b"), "axb"))
+
+    def test_domain(self):
+        filter_ = filters.DomainFilter("field", ["google.com", "Example.ORG"])
+        self.assertTrue(self.match(filter_, "google.com"))
+        self.assertTrue(self.match(filter_, "mail.google.com"))
+        self.assertTrue(self.match(filter_, "WWW.EXAMPLE.org"))
+        self.assertFalse(self.match(filter_, "evilgoogle.com"))
+        self.assertFalse(self.match(filter_, "google.com.evil"))
+        with self.assertRaises(ValueError):
+            filters.DomainFilter("field", [1])
+
+    def test_network_nested_blocks(self):
+        filter_ = filters.NetworkFilter("field", ["10.0.0.0/8", "10.1.0.0/16"])
+        self.assertTrue(self.match(filter_, "10.1.2.3"))
+        self.assertTrue(self.match(filter_, "10.1.0.0/16"))
+        self.assertTrue(self.match(filter_, "10.0.0.0/8"))
+        self.assertFalse(self.match(filter_, "11.0.0.1"))
+        self.assertFalse(self.match(filter_, "10.0.0.0/7"))
+
+    def test_network_adjacent_blocks_are_not_merged(self):
+        filter_ = filters.NetworkFilter("field", ["10.0.0.0/25", "10.0.0.128/25"])
+        self.assertTrue(self.match(filter_, "10.0.0.1"))
+        self.assertTrue(self.match(filter_, "10.0.0.200"))
+        self.assertFalse(self.match(filter_, "10.0.0.0/24"))
+
+    def test_network_unusual_event_values(self):
+        filter_ = filters.NetworkFilter("field", ["10.0.0.0/8", "2001:db8::/32"])
+        self.assertFalse(self.match(filter_, "10.0.0.1/24"))  # host bits set
+        self.assertTrue(self.match(filter_, "2001:db8::1"))
+        self.assertFalse(self.match(filters.NetworkFilter("field", "10.0.0.0/8"), "2001:db8::1"))
+        self.assertFalse(self.match(filters.NetworkFilter("field", "2001:db8::/32"), "10.0.0.1"))
+        self.assertFalse(self.match(filter_, "::ffff:10.0.0.1"))
+        for _ in range(2):  # the second call is served from the parse cache
+            self.assertFalse(self.match(filter_, "localhost"))
+        self.assertFalse(self.match(filter_, None))
+
+    def test_network_invalid_config_value_raises(self):
+        with self.assertRaises(ValueError):
+            filters.NetworkFilter("field", ["not-a-network"])
+
+    def test_not_network_is_the_inverse(self):
+        filter_ = filters.NotNetworkFilter("field", ["10.0.0.0/8"])
+        self.assertFalse(self.match(filter_, "10.1.1.1"))
+        self.assertTrue(self.match(filter_, "192.168.0.1"))
+        self.assertTrue(self.match(filter_, "localhost"))
+
+    def test_comparator_multiple_terms(self):
+        self.assertTrue(self.match(filters.ComparatorFilter("field", [5, 1], "GREATER"), 3))
+        self.assertFalse(self.match(filters.ComparatorFilter("field", [5, 1], "GREATER"), 1))
+        self.assertTrue(self.match(filters.ComparatorFilter("field", [5, 1], "LESS"), 3))
+        self.assertFalse(self.match(filters.ComparatorFilter("field", [5, 1], "LESS"), 5))
+
+    def test_comparator_equality_edge(self):
+        self.assertTrue(self.match(filters.ComparatorFilter("field", [5, 7], "GREATER_EQ"), 5))
+        self.assertFalse(self.match(filters.ComparatorFilter("field", [5, 7], "GREATER"), 5))
+        self.assertTrue(self.match(filters.ComparatorFilter("field", [5, 7], "LESS_EQ"), 7))
+        self.assertFalse(self.match(filters.ComparatorFilter("field", [5, 7], "LESS"), 7))
+
+    def test_comparator_nan_terms(self):
+        for comparator_type in ("GREATER", "LESS", "GREATER_EQ", "LESS_EQ"):
+            with self.subTest(comparator=comparator_type):
+                self.assertFalse(self.match(filters.ComparatorFilter("field", [float("nan")], comparator_type), 3))
+                self.assertFalse(self.match(filters.ComparatorFilter("field", [], comparator_type), 3))
+        # The NaN position must not change the result
+        for terms in ([float("nan"), 5], [5, float("nan")]):
+            self.assertTrue(self.match(filters.ComparatorFilter("field", terms, "GREATER"), 6))
+            self.assertFalse(self.match(filters.ComparatorFilter("field", terms, "GREATER"), 4))
+            self.assertTrue(self.match(filters.ComparatorFilter("field", terms, "LESS"), 4))
+            self.assertFalse(self.match(filters.ComparatorFilter("field", terms, "LESS"), 6))
+
+    def test_comparator_event_values(self):
+        filter_ = filters.ComparatorFilter("field", [5], "GREATER")
+        self.assertTrue(self.match(filter_, " 6 "))
+        self.assertFalse(self.match(filter_, "abc"))
+        self.assertFalse(self.match(filter_, None))
+        self.assertFalse(self.match(filter_, {}))
+        self.assertTrue(self.match(filter_, [1, 10]))
+
+    def test_comparator_huge_int_is_infinite(self):
+        huge = 2**1100
+        self.assertTrue(self.match(filters.ComparatorFilter("field", [5], "GREATER"), huge))
+        self.assertFalse(self.match(filters.ComparatorFilter("field", [5], "LESS"), huge))
+        self.assertFalse(self.match(filters.ComparatorFilter("field", [5], "GREATER"), -huge))
+        self.assertTrue(self.match(filters.ComparatorFilter("field", [5], "LESS"), -huge))
+
+    def test_cached_dictquery_defaults(self):
+        event = {"a": {"b": 1}, "empty": {}, "text": "foobar"}
+        cached, plain = CachedDictQuery(event), DictQuery(event)
+        for path in ("a.b", "a.missing", "missing", "empty.x", "text.x", "a.b.c"):
+            for default in ([], None, "unknown"):
+                for _ in range(2):  # the second call is served from the cache
+                    with self.subTest(path=path, default=default):
+                        self.assertEqual(cached.get(path, default), plain.get(path, default))
+
+    def test_cached_dictquery_non_string_path_behaves_like_dictquery(self):
+        with self.assertRaises(AttributeError):
+            DictQuery({}).get(None)
+        with self.assertRaises(AttributeError):
+            CachedDictQuery({}).get(None)
+
+    def test_cached_dictquery_does_not_cache_routing_history(self):
+        event = {"certego": {"routing_history": {}}}
+        cached = CachedDictQuery(event)
+        # DictQuery stops at the empty routing_history dict (falsy) and returns it instead of None
+        self.assertEqual(cached.get("certego.routing_history.k1"), {})
+        event["certego"]["routing_history"]["k1"] = "now"
+        self.assertEqual(cached.get("certego.routing_history.k1"), "now")
+
+    def test_match_does_not_share_cache_between_events(self):
+        routing = Routing()
+        routing.load_from_dicts([load_test_data("test_rule_31_equals_exist")])
+        event = load_test_data("test_event_19")
+        self.assertTrue(routing.match(copy.deepcopy(event)))
+        del event["source"]
+        self.assertFalse(routing.match(event))
 
 
 if __name__ == "__main__":

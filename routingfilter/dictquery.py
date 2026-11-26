@@ -66,3 +66,27 @@ class DictQuery(dict):
             key = keys.pop()
             tmp = {key: tmp}
         self.update(tmp)
+
+
+class CachedDictQuery(DictQuery):
+    """Event wrapper memoising get() for the lifetime of one Routing.match() call: set() and update() do not invalidate the cache."""
+
+    # Rule.match updates this path in place during a match() call, so its lookups must never be cached
+    UNCACHED_PATH_PREFIX = "certego.routing_history"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._lookup_cache = {}
+
+    def get(self, path, default=None):
+        """Same as DictQuery.get, cached by (path, repr(default)) since the default can end up inside list results."""
+        key = (path, repr(default))
+        try:
+            return self._lookup_cache[key]
+        except KeyError:
+            pass
+        value = super().get(path, default)
+        # Checked only on a miss: uncacheable paths are never stored, so a hit can never serve one
+        if isinstance(path, str) and not path.startswith(self.UNCACHED_PATH_PREFIX):
+            self._lookup_cache[key] = value
+        return value
